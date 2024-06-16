@@ -1,0 +1,109 @@
+/* create new blog form */
+.create {
+    width: 90%; /* הגדלת רוחב המלבן */
+    max-width: 600px; /* הגבלת רוחב מקסימלי */
+    margin: 0 auto;
+    text-align: center;
+    background: white;
+    padding: 5%;
+    border-radius: 15px; /* הגדלת העיגול של הפינות */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.create-container {
+    background: linear-gradient(to bottom right, lightblue, white);
+    padding: 2%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.form-row > div {
+    flex: 0 0 48%; /* שני השדות יתפסו כל אחד כמעט חצי שורה */
+    margin-bottom: 10px; /* רווח בין השדות */
+}
+
+.form-row.gender-row > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.create label {
+    text-align: right; /* יישור לימין */
+    display: block;
+    margin-bottom: 5px;
+}
+
+.create h2 {
+    font-size: 20px;
+    color: #f1356d;
+    margin-bottom: 30px;
+}
+
+.create input, .create textarea, .create select {
+    width: 100%;
+    padding: 6px 10px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    display: block;
+}
+
+.create input[type="radio"] {
+    width: auto;
+    margin: 0 5px 0 0;
+}
+
+.create button {
+    background: #f1356d;
+    color: #fff;
+    border: 0;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.radio-group {
+    display: flex;
+    justify-content: flex-end; /* יישור לימין */
+    align-items: center;
+}
+
+.radio-group label {
+    margin-left: 5px; /* ריווח בין התוויות */
+}
+
+/* Center the police approval field */
+.form-row.center {
+    justify-content: center;
+}
+
+.form-row.center > div {
+    flex: 0 0 100%; /* יישור השדה למרכז */
+}
+
+/* Make the form more responsive */
+@media (max-width: 768px) {
+    .form-row > div {
+        flex: 0 0 100%; /* כל שדה יתפוס 100% רוחב במסכים קטנים */
+    }
+}
+
+.main-title {
+    font-size: 20px;
+    color: #f1356d;
+}
+
+.sub-title {
+    font-size: 16px;
+    color: black;
+}
