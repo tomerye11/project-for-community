@@ -17,7 +17,10 @@ const Create = () => {
         policeApproval: null as File | null,
     });
     const [error, setError] = useState('');
-    const [withKids, setWithKids] = useState(false);
+    
+const [withKids, setWithKids] = useState(false);
+const [isSubmitDisabled, setIsSubmitDisabled] = useState(false); // Added state variable
+
 
     useEffect(() => {
         const fetchVolunteerAreas = async () => {
@@ -35,10 +38,26 @@ const Create = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type, checked, files } = e.target;
         if (type === 'file') {
-            setFormData({
-                ...formData,
-                [name]: files ? files[0] : null,
-            });
+            const file = files ? files[0] : null;
+            if (file && name === 'policeApproval' && file.type !== 'application/pdf') {
+                setError('PDF אנא העלה קובץ רק מסוג');
+                
+setFormData({
+    ...formData,
+    [name]: null,
+});
+setIsSubmitDisabled(true); // Disable submit button
+
+            } else {
+                setError('');
+                
+setFormData({
+    ...formData,
+    [name]: file,
+});
+setIsSubmitDisabled(false); // Enable submit button
+
+            }
         } else {
             setFormData({
                 ...formData,
@@ -52,7 +71,14 @@ const Create = () => {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    
+const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (withKids && formData.gender === 'Male' && (!formData.policeApproval || formData.policeApproval.type !== 'application/pdf')) {
+        setError('Police Approval file is required and must be a PDF.');
+        return;
+    }
+    
         e.preventDefault();
         setError('');
         console.log('Form submitted:', formData); // Debugging line
@@ -227,7 +253,9 @@ const Create = () => {
                             </div>
                         </div>
                     )}
-                    <button type="submit">שלח טופס</button>
+                    
+                    <button type="submit" disabled={isSubmitDisabled}>שלח טופס</button> {/* הוספת ניטרול כפתור השליחה */}
+
                 </form>
             </div>
         </div>
