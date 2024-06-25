@@ -1,0 +1,41 @@
+/* AdminPage.css */
+
+/* Container for the entire page */
+.create-container {
+    background: linear-gradient(to bottom right, lightblue, white);
+    padding: 2%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Style for the form container */
+.create {
+    width: 90%;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+    background: white;
+    padding: 5%;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.create h2 {
+    font-size: 20px;
+    color: #f1356d;
+    margin-bottom: 30px;
+}
+
+.create .edit-link {
+    display: block;
+    margin: 20px 0;
+    font-size: 18px;
+    color: #f1356d;
+    text-decoration: none;
+}
+
+.create .edit-link:hover {
+    text-decoration: underline;
+}

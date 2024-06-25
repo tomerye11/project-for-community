@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { db, storage } from './firebase'; // Ensure the correct path to your firebase config
 import { collection, getDocs, query, addDoc, updateDoc, doc, getDoc, Timestamp, arrayUnion, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import './Create.css';
+import './Registration.css';
 
-const Create = () => {
+const Registration = () => {
     const [volunteerAreas, setVolunteerAreas] = useState<Array<{ id: string, withKids: boolean }>>([]);
     const [formData, setFormData] = useState({
         id: '',
@@ -262,4 +262,4 @@ const handleSubmit = async (e: React.FormEvent) => {
     );
 };
 
-export default Create;
+export default Registration;
