@@ -200,19 +200,20 @@ const handleSubmit = async (e: React.FormEvent) => {
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 <form onSubmit={handleSubmit}>
                     <div className="form-row">
-                        <div>
-                            <label htmlFor="id">מס' תעודת זהות</label>
-                            <input type="text" id="id" name="id" value={formData.id} onChange={handleChange} required />
+                    <div>
+                            <label htmlFor="lastName">שם משפחה</label>
+                            <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} required />
                         </div>
+                        
                         <div>
                             <label htmlFor="firstName">שם פרטי</label>
                             <input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} required />
                         </div>
                     </div>
                     <div className="form-row">
-                        <div>
-                            <label htmlFor="lastName">שם משפחה</label>
-                            <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} required />
+                    <div>
+                            <label htmlFor="id">מס' תעודת זהות</label>
+                            <input type="text" id="id" name="id" value={formData.id} onChange={handleChange} required />
                         </div>
                         <div>
                             <label htmlFor="email">כתובת מייל</label>

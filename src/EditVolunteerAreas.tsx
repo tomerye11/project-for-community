@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './EditVolunteerAreas.css';
-import { collection, getDocs, doc, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 
 const EditVolunteerAreas = () => {
@@ -37,12 +37,12 @@ const EditVolunteerAreas = () => {
 
     const handleAdd = async (e) => {
         e.preventDefault();
-        setErrorMessage(''); // איפוס הודעת השגיאה
+        setErrorMessage(''); // Reset error message
         try {
             const docRef = doc(db, 'Volunteer Areas', newAreaName);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
-                setErrorMessage('Volunteer area with this name already exists.');
+                setErrorMessage('תחום ההתנדבות הזה כבר קיים.');
             } else {
                 await setDoc(doc(db, 'Volunteer Areas', newAreaName), {
                     'WhatsApp Link': newWhatsAppLink,
@@ -61,12 +61,12 @@ const EditVolunteerAreas = () => {
     return (
         <div className="create-container">
             <div className="create">
-                <h2>Edit Volunteer Areas</h2>
+                <h2>ערוך תחומי התנדבות</h2>
                 <table className="volunteer-table">
                     <thead>
                         <tr>
-                            <th>Action</th>
-                            <th>Name</th>
+                            <th>פעולה</th>
+                            <th>שם</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -78,7 +78,7 @@ const EditVolunteerAreas = () => {
                                             className="remove-button"
                                             onClick={() => handleRemove(area.id)}
                                         >
-                                            Remove
+                                            הסר
                                         </button>
                                     </td>
                                     <td>{area.id}</td>
@@ -86,15 +86,15 @@ const EditVolunteerAreas = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="2">No volunteer areas found.</td>
+                                <td colSpan="2">לא נמצאו תחומי התנדבות.</td>
                             </tr>
                         )}
                     </tbody>
                 </table>
                 <form onSubmit={handleAdd} className="add-form">
-                    <h3>Add Volunteer Area</h3>
+                    <h3>הוסף תחום התנדבות</h3>
                     <div className="form-row">
-                        <label>Name:</label>
+                        <label>:שם תחום ההתנדבות</label>
                         <input
                             type="text"
                             value={newAreaName}
@@ -103,7 +103,7 @@ const EditVolunteerAreas = () => {
                         />
                     </div>
                     <div className="form-row">
-                        <label>WhatsApp Link:</label>
+                        <label>:קישור לקבוצת הוואטסאפ</label>
                         <input
                             type="text"
                             value={newWhatsAppLink}
@@ -112,30 +112,30 @@ const EditVolunteerAreas = () => {
                         />
                     </div>
                     <div className="form-row">
-                        <label>With Kids:</label>
-                        <div>
+                    <label>עם ילדים:</label>
+                        <div className="radio-group">
                             <label>
+                                כן
                                 <input
                                     type="radio"
                                     value={true}
                                     checked={newWithKids === true}
                                     onChange={() => setNewWithKids(true)}
                                 />
-                                Yes
                             </label>
                             <label>
+                                לא
                                 <input
                                     type="radio"
                                     value={false}
                                     checked={newWithKids === false}
                                     onChange={() => setNewWithKids(false)}
                                 />
-                                No
                             </label>
                         </div>
                     </div>
                     {errorMessage && <p className="error-message">{errorMessage}</p>}
-                    <button type="submit" className="add-button">Add</button>
+                    <button type="submit" className="add-button">הוסף</button>
                 </form>
             </div>
         </div>

@@ -3,10 +3,8 @@ import Registration from './Registration';
 import AdminPage from './AdminPage';
 import EditVolunteerAreas from './EditVolunteerAreas'
 
-// import EditVolunteerAreas from './EditVolunteerAreas'; // צריך ליצור דף זה
-
 function App(){
-    return <div><AdminPage/></div>;
+    return <div><Registration/></div>;
     }
 
 export default App;

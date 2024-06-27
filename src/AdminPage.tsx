@@ -64,41 +64,41 @@ const AdminPage = () => {
     return (
         <div className="create-container">
             <div className="create">
-                <h2>Admin Page</h2>
-                <a href="/edit-volunteer-areas" className="edit-link">Edit Volunteer Areas</a>
+                <h2>דף מנהל</h2>
+                <a href="/edit-volunteer-areas" className="edit-link">ערוך תחומי התנדבות</a>
                 <table className="volunteer-table">
                     <thead>
                         <tr>
-                            <th>Volunteer Name</th>
-                            <th>ID</th>
-                            <th>Details</th>
-                            <th>Actions</th>
+                            <th>פעולות</th>
+                            <th>פרטים</th>
+                            <th>מספר זהות</th>
+                            <th>שם מתנדב</th>
                         </tr>
                     </thead>
                     <tbody>
                         {volunteers.length > 0 ? (
                             volunteers.map(volunteer => (
                                 <tr key={volunteer.docId}>
-                                    <td>{volunteer.firstName} {volunteer.lastName}</td>
-                                    <td>{volunteer.id}</td>
-                                    <td>
-                                        <button className="details-button" onClick={() => showDetails(volunteer)}>
-                                            Details
-                                        </button>
-                                    </td>
                                     <td className="actions-buttons">
                                         <button className="accept-button" onClick={() => handleAccept(volunteer.id)}>
-                                            Accept
+                                            קבל
                                         </button>
                                         <button className="reject-button" onClick={() => handleReject(volunteer.id)}>
-                                            Reject
+                                            דחה
                                         </button>
                                     </td>
+                                    <td>
+                                        <button className="details-button" onClick={() => showDetails(volunteer)}>
+                                            פרטים
+                                        </button>
+                                    </td>
+                                    <td>{volunteer.id}</td>
+                                    <td>{volunteer.firstName} {volunteer.lastName}</td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="4">No unconfirmed volunteers found.</td>
+                                <td colSpan="4">לא נמצאו מתנדבים לא מאושרים.</td>
                             </tr>
                         )}
                     </tbody>
@@ -106,23 +106,23 @@ const AdminPage = () => {
                 {selectedVolunteer && (
                     <div className="details-modal">
                         <div className="details-content">
-                            <h3>Volunteer Details</h3>
-                            <p><strong>First Name:</strong> {selectedVolunteer.firstName}</p>
-                            <p><strong>Last Name:</strong> {selectedVolunteer.lastName}</p>
-                            <p><strong>Email:</strong> {selectedVolunteer.email}</p>
-                            <p><strong>Phone:</strong> {selectedVolunteer.phone}</p>
-                            <p><strong>Volunteer Area:</strong> {selectedVolunteer.volunteerArea}</p>
-                            <p><strong>Gender:</strong> {selectedVolunteer.gender === 'M' ? 'זכר' : selectedVolunteer.gender === 'F' ? 'נקבה' : 'לא ידוע'}</p>
+                            <h3>פרטי מתנדב</h3>
+                            <p><strong>שם פרטי:</strong> {selectedVolunteer.firstName}</p>
+                            <p><strong>שם משפחה:</strong> {selectedVolunteer.lastName}</p>
+                            <p><strong>מספר זהות:</strong> {selectedVolunteer.id}</p>
+                            <p><strong>מין:</strong> {selectedVolunteer.gender === 'M' ? 'זכר' : selectedVolunteer.gender === 'F' ? 'נקבה' : 'לא ידוע'}</p>
+                            <p><strong>אימייל:</strong> {selectedVolunteer.email}</p>
+                            <p><strong>טלפון:</strong> {selectedVolunteer.phone}</p>
+                            <p><strong>תחום התנדבות:</strong> {Array.isArray(selectedVolunteer.volunteerArea) ? selectedVolunteer.volunteerArea.join(', ') : selectedVolunteer.volunteerArea}</p>
                             {selectedVolunteer.policeForm && (
-                              <p>
-                                 <strong>Police Form:</strong>{' '}
+                                <p>
+                                    <strong>טופס אישור מהמשטרה:</strong>{' '}
                                     <a href={selectedVolunteer.policeForm} target="_blank" rel="noopener noreferrer">
-                                     View Police Form
+                                        צפה בטופס
                                     </a>
                                 </p>
                             )}
-
-                            <button className="close-button" onClick={closeDetails}>Close</button>
+                            <button className="close-button" onClick={closeDetails}>סגור</button>
                         </div>
                     </div>
                 )}
