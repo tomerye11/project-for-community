@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './EditVolunteerAreas.css';
-import { collection, getDocs, doc, deleteDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
 
 const EditVolunteerAreas = () => {
@@ -8,6 +8,7 @@ const EditVolunteerAreas = () => {
     const [newAreaName, setNewAreaName] = useState('');
     const [newWhatsAppLink, setNewWhatsAppLink] = useState('');
     const [newWithKids, setNewWithKids] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         // Fetch volunteer areas from the database
@@ -36,15 +37,22 @@ const EditVolunteerAreas = () => {
 
     const handleAdd = async (e) => {
         e.preventDefault();
+        setErrorMessage(''); // איפוס הודעת השגיאה
         try {
-            await setDoc(doc(db, 'Volunteer Areas', newAreaName), {
-                'WhatsApp Link': newWhatsAppLink,
-                'With Kids': newWithKids
-            });
-            setVolunteerAreas([...volunteerAreas, { id: newAreaName, 'WhatsApp Link': newWhatsAppLink, 'With Kids': newWithKids }]);
-            setNewAreaName('');
-            setNewWhatsAppLink('');
-            setNewWithKids(false);
+            const docRef = doc(db, 'Volunteer Areas', newAreaName);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                setErrorMessage('Volunteer area with this name already exists.');
+            } else {
+                await setDoc(doc(db, 'Volunteer Areas', newAreaName), {
+                    'WhatsApp Link': newWhatsAppLink,
+                    'withKids': newWithKids
+                });
+                setVolunteerAreas([...volunteerAreas, { id: newAreaName, 'WhatsApp Link': newWhatsAppLink, 'withKids': newWithKids }]);
+                setNewAreaName('');
+                setNewWhatsAppLink('');
+                setNewWithKids(false);
+            }
         } catch (error) {
             console.error('Error adding volunteer area:', error);
         }
@@ -126,6 +134,7 @@ const EditVolunteerAreas = () => {
                             </label>
                         </div>
                     </div>
+                    {errorMessage && <p className="error-message">{errorMessage}</p>}
                     <button type="submit" className="add-button">Add</button>
                 </form>
             </div>
