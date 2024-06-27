@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './AdminPage.css';
 import { collection, getDocs, query, where, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
@@ -65,7 +66,7 @@ const AdminPage = () => {
         <div className="create-container">
             <div className="create">
                 <h2>דף מנהל</h2>
-                <a href="/edit-volunteer-areas" className="edit-link">ערוך תחומי התנדבות</a>
+                <Link to="/edit-volunteer-areas" className="edit-link">ערוך תחומי התנדבות</Link>
                 <table className="volunteer-table">
                     <thead>
                         <tr>
@@ -98,7 +99,7 @@ const AdminPage = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="4">לא נמצאו מתנדבים לא מאושרים.</td>
+                                <td colSpan="4">לא נמצאו מתנדבים לא מאושרים</td>
                             </tr>
                         )}
                     </tbody>

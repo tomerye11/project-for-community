@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './EditVolunteerAreas.css';
-import { collection, getDocs, doc, deleteDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
 
 const EditVolunteerAreas = () => {
