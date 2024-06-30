@@ -219,14 +219,29 @@ const handleSubmit = async (e: React.FormEvent) => {
                             <label htmlFor="email">כתובת מייל</label>
                             <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
                         </div>
+                    
+
                     </div>
                     <div className="form-row">
                         <div>
                             <label htmlFor="phone">מס' טלפון</label>
                             <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
                         </div>
+                        <div className="gender-row">
+                            <label>מין</label>
+                            <div className="radio-group">
+
+                                <label htmlFor="female">נקבה</label>
+                                <input type="radio" id="female" name="gender" value="female" onChange={handleChange} required />
+
+                                <label htmlFor="male">זכר</label>
+                                <input type="radio" id="male" name="gender" value="male" onChange={handleChange} required />
+                                
+                            </div>
+                        </div>
+                        
                     </div>
-                    <div className="form-row">
+                    <div className="form-row full-width">
                         <div>
                             <label htmlFor="volunteer">תחום התנדבות</label>
                             <select id="volunteer" name="volunteerArea" value={formData.volunteerArea} onChange={handleChange} required>
@@ -235,15 +250,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                                     <option key={area.id} value={area.id}>{area.id}</option>
                                 ))}
                             </select>
-                        </div>
-                        <div className="gender-row">
-                            <label>מין</label>
-                            <div className="radio-group">
-                                <label htmlFor="male">זכר</label>
-                                <input type="radio" id="male" name="gender" value="male" onChange={handleChange} required />
-                                <label htmlFor="female">נקבה</label>
-                                <input type="radio" id="female" name="gender" value="female" onChange={handleChange} required />
-                            </div>
                         </div>
                     </div>
                     {formData.gender === 'male' && withKids && (

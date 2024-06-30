@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import AdminPage from './AdminPage';
 import EditVolunteerAreas from './EditVolunteerAreas';
+import Registration from './Registration';
 
 function App() {
     return (
@@ -8,6 +9,9 @@ function App() {
             <Routes>
                 <Route path="/" element={<AdminPage />} />
                 <Route path="/edit-volunteer-areas" element={<EditVolunteerAreas />} />
+
+                {/* <Route path="/" element={<Registration />} /> */}
+
             </Routes>
         </Router>
     );

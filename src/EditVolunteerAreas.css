@@ -69,7 +69,9 @@
 
 .form-row {
     margin-bottom: 10px;
+    text-align: right;
 }
+    
 
 .form-row label {
     display: block;

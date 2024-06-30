@@ -1,3 +1,5 @@
+/* Registration.css */
+
 /* create new blog form */
 .create {
     width: 90%; /* הגדלת רוחב המלבן */
@@ -29,6 +31,10 @@
 .form-row > div {
     flex: 0 0 48%; /* שני השדות יתפסו כל אחד כמעט חצי שורה */
     margin-bottom: 10px; /* רווח בין השדות */
+}
+
+.form-row.full-width > div {
+    flex: 0 0 100%; /* שדה יתפוס את כל רוחב השורה */
 }
 
 .form-row.gender-row > div {
@@ -79,7 +85,10 @@
 }
 
 .radio-group label {
-    margin-left: 5px; /* ריווח בין התוויות */
+    display: flex;
+    align-items: center;
+    gap: 5px; /* ריווח בין הכפתור לטקסט */
+    flex-direction: row-reverse; /* סדר הפוך: כפתור מצד ימין, טקסט מצד שמאל */
 }
 
 /* Center the police approval field */

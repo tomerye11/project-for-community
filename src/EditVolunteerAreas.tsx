@@ -112,7 +112,7 @@ const EditVolunteerAreas = () => {
                         />
                     </div>
                     <div className="form-row">
-                    <label>עם ילדים:</label>
+                    <label>:עם ילדים</label>
                         <div className="radio-group">
                             <label>
                                 כן
