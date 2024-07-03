@@ -1,0 +1,234 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: OS Aran W FFC 500;
+    margin: 0; /* Remove default body margin */
+    height: 100vh; /* Ensure body takes full height */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Style the header */
+.header {
+    background-color: white; /* Change background color to white */
+    text-align: center;
+    font-size: 35px;
+    position: relative;
+    padding: 70px 70px; /* Increase padding for height */
+    flex: 0 0 auto; /* Header height fixed */
+    border-bottom: 2px solid #00237a; /* Add bottom border */
+    width: 80%;
+    margin: 0 auto; /* Center the div horizontally */
+    display: block; /* Ensure the div is a block-level element */
+}
+
+/* Add logo */
+.header img.logo {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 150px; /* Increase logo size */
+}
+
+/* Create two unequal columns that float next to each other */
+.row {
+    display: flex;
+    flex: 1 0 auto; /* Row takes remaining height */
+    
+}
+
+/* Right column */
+.column.side {
+    width: 16%;
+    background-color: #ccc;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 2px solid #00237a;  
+    
+}
+
+/* Middle column */
+.column.middle {
+    width: 63%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Center align items */
+    justify-content: center; /* Center vertically */
+    border-bottom: 2px solid #00237a; /* Add bottom border */
+    margin-left: 10.5%;
+    text-align: right;
+    
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+@media (max-width: 600px) {
+    .column.side, .column.middle {
+        width: 100%;
+    }
+}
+
+ul.menu {
+    list-style-type: none;
+    padding: 0;
+    margin: 0; /* Remove default margin */
+    flex: 1 0 auto; /* Menu takes remaining height */
+}
+
+ul.menu li {
+    background-color: #ccc;
+    margin: 5px 0;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    flex: 0 0 auto; /* Fixed height for menu items */
+}
+
+ul.menu li:hover {
+    background-color: #aaa;
+}
+
+table {
+    width: 80%; /* Adjust the width to fit the content */
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: right;
+}
+
+thead tr {
+    background-color: #00237a;
+    color: #ffffff;
+    text-align: right;
+    font-weight: bold;
+}
+
+th, td {
+    padding: 12px 15px;
+    border: 1px solid black; /* הוספת גבולות פנימיים */
+}
+
+tbody tr {
+    /* border-bottom: 1px solid black; */
+    border: 1px solid black;
+}
+
+.action-button {
+    background-color: #00237a;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 5px; /* מרווח בין הכפתורים */
+}
+
+.action-button:last-of-type {
+    margin-right: 0; /* הסרת מרווח מהכפתור האחרון */
+}
+
+.action-button:hover {
+    background-color: #475191;
+}
+
+.message {
+    background-color: #c4cadf;
+    color: white;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #d6e9c6;
+    border-radius: 4px;
+    text-align: center;
+}
+
+input[type="text"] {
+    width: calc(100% - 10px);
+    padding: 5px;
+    margin-top: 5px;
+}
+
+.align-right {
+    text-align: right;
+  }
+
+input[type="radio"] {
+    margin-left: 10px;
+}
+
+.modal {
+    display: none; /* מוסתר כברירת מחדל */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* צבע רקע שקוף */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 60%; /* רוחב בינוני */
+    max-width: 600px; /* הגבלת רוחב מקסימלי */
+    height: 70%; /* גובה בינוני */
+    max-height: 500px; /* הגבלת גובה מקסימלי */
+    border-radius: 10px; /* פינות מעוגלות */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* הצללה */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .modal-header h4 {
+    margin: 0;
+  }
+  
+  .modal-body {
+    flex: 1; /* מאפשר לגוף המודאל לקחת את המקום הנותר */
+    overflow-y: auto; /* גלילה אנכית אם התוכן חורג מהגובה */
+  }
+  
+  .close-button {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    background-color: #475191;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: flex-end;
+  }
+  
+  .close-button:hover {
+    background-color: #3a437a;
+  }
+  
+  .form-group {
+    margin-bottom: 15px; /* מגדיר מרווח של 15 פיקסלים בין השורות */
+  }
+  
+  
