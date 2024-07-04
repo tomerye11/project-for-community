@@ -2,18 +2,19 @@
 
 /* create new blog form */
 .create {
-    width: 90%; /* הגדלת רוחב המלבן */
-    max-width: 600px; /* הגבלת רוחב מקסימלי */
+    width: 90%;
+    max-width: 600px;
     margin: 0 auto;
     text-align: center;
     background: white;
     padding: 5%;
-    border-radius: 15px; /* הגדלת העיגול של הפינות */
+    /* border-radius: 15px; הסרת הפינות העגולות */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #00237a;
 }
 
 .create-container {
-    background: linear-gradient(to bottom right, lightblue, white);
+    background: linear-gradient(to bottom right, #ccc, white);
     padding: 2%;
     display: flex;
     justify-content: center;
@@ -29,12 +30,12 @@
 }
 
 .form-row > div {
-    flex: 0 0 48%; /* שני השדות יתפסו כל אחד כמעט חצי שורה */
-    margin-bottom: 10px; /* רווח בין השדות */
+    flex: 0 0 48%;
+    margin-bottom: 10px;
 }
 
 .form-row.full-width > div {
-    flex: 0 0 100%; /* שדה יתפוס את כל רוחב השורה */
+    flex: 0 0 100%;
 }
 
 .form-row.gender-row > div {
@@ -43,15 +44,29 @@
 }
 
 .create label {
-    text-align: right; /* יישור לימין */
+    text-align: right;
     display: block;
     margin-bottom: 5px;
 }
 
 .create h2 {
     font-size: 20px;
-    color: #f1356d;
+    color: #00237a;
     margin-bottom: 30px;
+    position: relative; /* מאפשר הצבת הלוגו */
+}
+
+.create h2::before {
+    content: '';
+    background-image: url('logo2.jpg'); /* הוספת הלוגו */
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    left: -50px; /* מקם את הלוגו משמאל לכותרת */
+    top: 50%;
+    transform: translateY(-50%);
+    height: 150px; /* גובה מותאם */
+    width: 150px; /* רוחב מותאם */
 }
 
 .create input, .create textarea, .create select {
@@ -69,50 +84,54 @@
 }
 
 .create button {
-    background: #f1356d;
+    background: #00237a;
     color: #fff;
     border: 0;
     padding: 8px;
-    border-radius: 8px;
+    /* border-radius: 8px; */
     cursor: pointer;
-    width: 100%;
+    width: 30%;
+    transition: transform 0.3s ease; /* זמן המעבר */
+}
+
+.create button:hover {
+    background-color: #475191;
+    transform: scale(1.05); /* הגדלת הכפתור ב-10% */
 }
 
 .radio-group {
     display: flex;
-    justify-content: flex-end; /* יישור לימין */
+    justify-content: flex-end;
     align-items: center;
 }
 
 .radio-group label {
     display: flex;
     align-items: center;
-    gap: 5px; /* ריווח בין הכפתור לטקסט */
-    flex-direction: row-reverse; /* סדר הפוך: כפתור מצד ימין, טקסט מצד שמאל */
+    gap: 5px;
+    flex-direction: row-reverse;
 }
 
-/* Center the police approval field */
 .form-row.center {
     justify-content: center;
 }
 
 .form-row.center > div {
-    flex: 0 0 100%; /* יישור השדה למרכז */
+    flex: 0 0 100%;
 }
 
-/* Make the form more responsive */
 @media (max-width: 768px) {
     .form-row > div {
-        flex: 0 0 100%; /* כל שדה יתפוס 100% רוחב במסכים קטנים */
+        flex: 0 0 100%;
     }
 }
 
 .main-title {
-    font-size: 20px;
-    color: #f1356d;
+    font-size: 24px;
+    color: #00237a;
 }
 
 .sub-title {
-    font-size: 16px;
+    font-size: 18px; /* גודל טקסט מעודכן */
     color: black;
 }

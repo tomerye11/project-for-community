@@ -37,17 +37,15 @@ body {
 .row {
     display: flex;
     flex: 1 0 auto; /* Row takes remaining height */
-    
 }
 
 /* Right column */
 .column.side {
     width: 16%;
-    background-color: #ccc;
+    background-color: #dedddd;
     display: flex;
     flex-direction: column;
     border-bottom: 2px solid #00237a;  
-    
 }
 
 /* Middle column */
@@ -60,7 +58,6 @@ body {
     border-bottom: 2px solid #00237a; /* Add bottom border */
     margin-left: 10.5%;
     text-align: right;
-    
 }
 
 /* Clear floats after the columns */
@@ -85,16 +82,29 @@ ul.menu {
 }
 
 ul.menu li {
-    background-color: #ccc;
+    background-color: #dedddd;
     margin: 5px 0;
     padding: 10px;
     text-align: center;
     cursor: pointer;
     flex: 0 0 auto; /* Fixed height for menu items */
+    transition: background-color 0.3s, opacity 0.5s; /* Add transition for background color and opacity */
+    opacity: 0; /* Initially hidden */
+    animation: fadeIn 0.5s forwards; /* Add fadeIn animation */
 }
 
 ul.menu li:hover {
     background-color: #aaa;
+}
+
+/* Keyframes for fadeIn animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 table {
@@ -103,6 +113,10 @@ table {
     margin: 20px 0;
     font-size: 16px;
     text-align: right;
+    /* Add slideIn animation */
+    opacity: 0;
+    transform: translateX(-100%);
+    animation: slideIn 0.5s forwards;
 }
 
 thead tr {
@@ -114,12 +128,30 @@ thead tr {
 
 th, td {
     padding: 12px 15px;
-    border: 1px solid black; /* הוספת גבולות פנימיים */
 }
 
 tbody tr {
-    /* border-bottom: 1px solid black; */
-    border: 1px solid black;
+    border: 1px solid #F8F8F8;
+    opacity: 0;
+    transform: translateX(-100%);
+    animation: slideIn 0.5s forwards;
+    animation-delay: calc(0.1s * var(--i)); /* Add delay for each row */
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #F8F8F8; /* רקע לשורות במיקום אי זוגי */
+}
+
+tbody tr:nth-child(even) {
+    background-color: #ffffff; /* רקע לשורות במיקום זוגי */
+}
+
+/* Keyframes for slideIn animation */
+@keyframes slideIn {
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 .action-button {
@@ -130,6 +162,9 @@ tbody tr {
     cursor: pointer;
     font-size: 16px;
     margin-right: 5px; /* מרווח בין הכפתורים */
+    transition: background-color 0.3s, opacity 0.5s; /* Add transition for background color and opacity */
+    opacity: 0; /* Initially hidden */
+    animation: fadeIn 0.5s forwards; /* Add fadeIn animation */
 }
 
 .action-button:last-of-type {
@@ -138,6 +173,7 @@ tbody tr {
 
 .action-button:hover {
     background-color: #475191;
+    transform: scale(1.1); /* הגדלת הכפתור ב-10% */
 }
 
 .message {
@@ -158,7 +194,7 @@ input[type="text"] {
 
 .align-right {
     text-align: right;
-  }
+}
 
 input[type="radio"] {
     margin-left: 10px;
@@ -177,9 +213,9 @@ input[type="radio"] {
     display: flex;
     align-items: center;
     justify-content: center;
-  }
+}
   
-  .modal-content {
+.modal-content {
     background-color: #fefefe;
     margin: auto;
     padding: 20px;
@@ -192,27 +228,27 @@ input[type="radio"] {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* הצללה */
     display: flex;
     flex-direction: column;
-  }
+}
   
-  .modal-header {
+.modal-header {
     display: flex;
     justify-content: center;
     align-items: center;
     border-bottom: 1px solid #ddd;
     padding-bottom: 10px;
     margin-bottom: 20px;
-  }
+}
   
-  .modal-header h4 {
+.modal-header h4 {
     margin: 0;
-  }
+}
   
-  .modal-body {
+.modal-body {
     flex: 1; /* מאפשר לגוף המודאל לקחת את המקום הנותר */
     overflow-y: auto; /* גלילה אנכית אם התוכן חורג מהגובה */
-  }
+}
   
-  .close-button {
+.close-button {
     padding: 10px 20px;
     margin-left: 10px;
     border: none;
@@ -221,14 +257,13 @@ input[type="radio"] {
     border-radius: 5px;
     cursor: pointer;
     align-self: flex-end;
-  }
+}
   
-  .close-button:hover {
+.close-button:hover {
     background-color: #3a437a;
-  }
+    transform: scale(1.1); /* הגדלת הכפתור ב-10% */
+}
   
-  .form-group {
+.form-group {
     margin-bottom: 15px; /* מגדיר מרווח של 15 פיקסלים בין השורות */
-  }
-  
-  
+}
