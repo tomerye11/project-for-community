@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "createVolunteer.js", "firebaseAdmin.js", "server.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -10,7 +10,8 @@
     padding: 5%;
     /* border-radius: 15px; הסרת הפינות העגולות */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #00237a;
+    /* border: 1px solid #00237a; */
+    border-radius:10px;
 }
 
 .create-container {

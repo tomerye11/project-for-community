@@ -10,7 +10,7 @@ ChartJS.register(ArcElement, BarElement, Tooltip, Legend, CategoryScale, LinearS
 
 const AdminPage2: React.FC = () => {
 	const [volunteerAreas, setVolunteerAreas] = useState<any[]>([]);
-	const [selectedMenu, setSelectedMenu] = useState<string>('');
+	const [selectedMenu, setSelectedMenu] = useState('statistics');
 	const [editAreaId, setEditAreaId] = useState<string | null>(null);
 	const [updatedArea, setUpdatedArea] = useState<any>({});
 	const [message, setMessage] = useState<string | null>(null);
@@ -192,29 +192,48 @@ const AdminPage2: React.FC = () => {
 		}
 	};
 
-	const handleApprove = async (volunteerId: string) => {
-		try {
-			const querySnapshot = await getDocs(collection(db, "Volunteers"));
-			const volunteerDoc = querySnapshot.docs.find(doc => doc.data().id === volunteerId);
-			if (volunteerDoc) {
-				await updateDoc(doc(db, "Volunteers", volunteerDoc.id), {
-					confirmed: true
-				});
-				setVolunteers(prevVolunteers => prevVolunteers.map(volunteer =>
-					volunteer.id === volunteerId ? { ...volunteer, confirmed: true } : volunteer
-				));
-				setMessage("המתנדב אושר בהצלחה!");
-				setTimeout(() => {
-					setMessage(null);
-				}, 2500);
-			}
-		} catch (error) {
-			setMessage("שגיאה באישור המתנדב.");
-			setTimeout(() => {
-				setMessage(null);
-			}, 2500);
-		}
-	};
+    const handleApprove = async (volunteerId: string) => {
+        try {
+            const querySnapshot = await getDocs(collection(db, "Volunteers"));
+            const volunteerDoc = querySnapshot.docs.find(doc => doc.data().id === volunteerId);
+    
+            if (volunteerDoc) {
+                const volunteerData = volunteerDoc.data();
+                const response = await fetch('http://localhost:3003/api/approve-volunteer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(volunteerData),
+                });
+    
+                if (response.ok) {
+                    await updateDoc(doc(db, "Volunteers", volunteerDoc.id), {
+                        confirmed: true
+                    });
+                    setVolunteers(prevVolunteers => prevVolunteers.map(volunteer =>
+                        volunteer.id === volunteerId ? { ...volunteer, confirmed: true } : volunteer
+                    ));
+                    setMessage("המתנדב אושר בהצלחה!");
+                    setTimeout(() => {
+                        setMessage(null);
+                    }, 2500);
+                } else {
+                    setMessage('Failed to approve volunteer');
+                    setTimeout(() => {
+                        setMessage(null);
+                    }, 2500);
+                }
+            }
+        } catch (error) {
+            setMessage("שגיאה באישור המתנדב.");
+            setTimeout(() => {
+                setMessage(null);
+            }, 2500);
+        }
+    };
+    
+    
 
 	const handleReject = async (volunteerId: string) => {
 		try {
@@ -240,8 +259,13 @@ const AdminPage2: React.FC = () => {
 	return (
 		<div>
 			<div className="header">
-				<img src="logo2.jpg" alt="Logo" className="logo" />
-				<h2>דף מנהל - מינהל קהילתי לב העיר</h2>
+			    <h2 className="header-title">דף מנהל - מינהל קהילתי לב העיר</h2>
+				<img 
+                 src="logo2.jpg" 
+                 alt="Logo" 
+                 className="logo" 
+                 onClick={() => setSelectedMenu('statistics')} // הוספת אירוע קליק ללוגו
+                />
 			</div>
 
 			<div className="row">
@@ -251,7 +275,7 @@ const AdminPage2: React.FC = () => {
 
 					{selectedMenu === 'statistics' && (
 						<div>
-							<h3>סטטיסטיקה</h3>
+							<h3 className="large-margin-bottom" >נתוני המינהל</h3>
 							<div style={{ display: 'flex', justifyContent: 'space-around', gap: '100px' }}>
 								<div style={{ width: '45%', height: '400px' }}>
 									<Pie
@@ -339,7 +363,7 @@ const AdminPage2: React.FC = () => {
 
 					{selectedMenu === 'volunteerTable' && (
 						<>
-							<h3>טבלת מתנדבים מאושרים</h3>
+							<h3 className="large-margin-bottom">טבלת מתנדבים מאושרים</h3>
 							<table>
 								<thead>
 									<tr>
@@ -398,7 +422,7 @@ const AdminPage2: React.FC = () => {
 
 					{selectedMenu === 'editVolunteerAreas' && (
 						<>
-							<h3>עריכת תחומי התנדבות</h3>
+							<h3 className="large-margin-bottom">עריכת תחומי התנדבות</h3>
 							<table>
 								<thead>
 									<tr>
@@ -480,42 +504,43 @@ const AdminPage2: React.FC = () => {
 						</>
 					)}
 
-					{selectedMenu === 'approveVolunteers' && (
-						<>
-							<h3>אישור מתנדבים</h3>
-							<table>
-								<thead>
-									<tr>
-										<th>פעולות</th>
-										<th>פרטים</th>
-										<th>מס' תעודת זהות</th>
-										<th>שם</th>
-									</tr>
-								</thead>
-								<tbody>
-									{volunteers
-										.filter(volunteer => !volunteer.confirmed) // סינון המתנדבים שהשדה confirmed שלהם false
-										.map(volunteer => (
-											<tr key={volunteer.id}>
-												<td>
-													<button className="action-button" onClick={() => handleApprove(volunteer.id)}>אשר</button>
-													<button className="action-button" onClick={() => handleReject(volunteer.id)}>דחה</button>
-												</td>
-												<td>
-													<button className="action-button" onClick={() => handleDetailsClick(volunteer)}>הצג פרטים</button>
-												</td>
-												<td>{volunteer.id}</td>
-												<td>{volunteer.firstName} {volunteer.lastName}</td>
-											</tr>
-										))}
-								</tbody>
-							</table>
-						</>
-					)}
+                    {selectedMenu === 'approveVolunteers' && (
+                        <>
+                            <h3 className="large-margin-bottom" >אישור מתנדבים</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>פעולות</th>
+                                        <th>פרטים</th>
+                                        <th>מס' תעודת זהות</th>
+                                        <th>שם</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {volunteers
+                                        .filter(volunteer => !volunteer.confirmed) // סינון המתנדבים שהשדה confirmed שלהם false
+                                        .map(volunteer => (
+                                            <tr key={volunteer.id}>
+                                                <td>
+                                                    <button className="action-button" onClick={() => handleApprove(volunteer.id)}>אשר</button>
+                                                    <button className="action-button" onClick={() => handleReject(volunteer.id)}>דחה</button>
+                                                </td>
+                                                <td>
+                                                    <button className="action-button" onClick={() => handleDetailsClick(volunteer)}>הצג פרטים</button>
+                                                </td>
+                                                <td>{volunteer.id}</td>
+                                                <td>{volunteer.firstName} {volunteer.lastName}</td>
+                                            </tr>
+                                        ))}
+                                </tbody>
+                            </table>
+                        </>
+                    )}
+
 
 					{selectedMenu === 'addVolunteerArea' && (
 						<div>
-							<h3>הוספת תחום התנדבות</h3>
+							<h3 className="large-margin-bottom">הוספת תחום התנדבות</h3>
 							<div className="form-group">
 								<label>:שם</label>
 								<input
@@ -569,10 +594,13 @@ const AdminPage2: React.FC = () => {
 						<li onClick={() => setSelectedMenu('addVolunteerArea')}>הוספת תחום התנדבות</li>
 						<li onClick={() => setSelectedMenu('approveVolunteers')}>אישור מתנדבים</li>
 						<li onClick={() => setSelectedMenu('volunteerTable')}>טבלת מתנדבים</li>
-						<li onClick={() => setSelectedMenu('statistics')}>סטטיסטיקה</li>
+						<li onClick={() => setSelectedMenu('statistics')}>נתוני המינהל</li>
 					</ul>
 				</div>
 			</div>
+			<div className="footer">
+             <a href="https://www.levhair.org.il/index.php">חזרה לאתר המינהל</a>
+            </div>
 		</div>
 	);
 };
