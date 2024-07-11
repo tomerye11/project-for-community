@@ -7,6 +7,13 @@
     src: url('./OS Aran W FFC 500.ttf') format('truetype');
   }
 
+  html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 /* Style the header */
 .header {
     font-family: 'OS Aran W FFC 500', sans-serif;
@@ -49,7 +56,6 @@
 
 /* Create two unequal columns that float next to each other */
 .row {
-    
     font-family: 'OS Aran W FFC 500', sans-serif;
     display: flex;
     flex: 1 0 auto; /* Row takes remaining height */
@@ -58,8 +64,7 @@
 /* Right column */
 .column.side {
     font-family: 'OS Aran W FFC 500', sans-serif;
-    width: 18%;
-    /* background-color: #dedddd; */
+    width: 20%;
     display: flex;
     flex-direction: column;
     border-bottom: 2px solid #00237a; 
@@ -69,7 +74,7 @@
 /* Middle column */
 .column.middle {
     font-family: 'OS Aran W FFC 500', sans-serif;
-    width: 82%;
+    width: 80%;
     display: flex;
     flex-direction: column;
     justify-content: center; /* Center vertically */
@@ -292,16 +297,16 @@ input[type="radio"] {
 .form-group {
     margin-bottom: 15px; /* מגדיר מרווח של 15 פיקסלים בין השורות */
 }
+
 .footer {
-    font-family: 'OS Aran W FFC 500', sans-serif;
-    background-color: #00237a; /* צבע רקע אפור בהיר */
+    flex-shrink: 0; /* Ensure the footer does not shrink */
+    background-color: #00237a; 
     text-align: center;
-    padding: 20px 0; /* רווח פנימי אנכי */
-    position: fixed;
-    bottom: 0;
+    padding: 20px 0; 
     width: 100%;
     font-size: larger;
-  }
+}
+
   
   .footer a {
     color: white; /* צבע הכחול של הלינק */
@@ -311,6 +316,17 @@ input[type="radio"] {
   .footer a:hover {
     text-decoration: underline; /* הוספת קו תחתון בהובר */
   }
+
+  .container {
+    flex: 1; /* Grow to take the remaining space */
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Full height of the viewport */
+}
+
 
   .large-margin-bottom {
     margin-bottom: 2%; /* מרווח גדול יותר מתחת לכותרת */

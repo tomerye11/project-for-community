@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './AdminPage2.css';
 import { db } from './firebase';
-import { collection, getDocs, deleteDoc, updateDoc, doc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, updateDoc,writeBatch, doc, setDoc} from 'firebase/firestore';
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, BarElement, Tooltip, Legend, CategoryScale, LinearScale } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 
 ChartJS.register(ArcElement, BarElement, Tooltip, Legend, CategoryScale, LinearScale, ChartDataLabels);
 
@@ -30,6 +32,7 @@ const AdminPage2: React.FC = () => {
 		volunteerArea?: string[];
 		confirmed?: boolean;
 		policeForm?: string; 
+		BLform?: string;
 	}
 
 	const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
@@ -62,7 +65,8 @@ const AdminPage2: React.FC = () => {
 					startDate: doc.data().startDate,
 					volunteerArea: doc.data().volunteerArea,
 					confirmed: doc.data().confirmed,
-					policeForm: doc.data().policeForm
+					policeForm: doc.data().policeForm,
+					BLform: doc.data().BLform
 				}));
 				setVolunteers(volunteers);
 
@@ -124,20 +128,37 @@ const AdminPage2: React.FC = () => {
 	};
 
 	const handleSave = async () => {
-		if (!updatedArea.id || !updatedArea.withKids || !updatedArea.whatsAppLink) {
+		if (!updatedArea.id || updatedArea.withKids === undefined || !updatedArea.whatsAppLink) {
 			setMessage('נא למלא את כל השדות.');
 			setTimeout(() => {
 				setMessage(null);
 			}, 2500);
 			return;
 		}
-
+	
 		if (editAreaId && updatedArea.id !== editAreaId) {
 			await createNewDocument(updatedArea);
 			await deleteOldDocument(editAreaId);
+	
+			// עדכון תחומי ההתנדבות לכל המתנדבים
+			const volunteersSnapshot = await getDocs(collection(db, 'Volunteers'));
+			const batch = writeBatch(db);
+	
+			volunteersSnapshot.forEach((doc) => {
+				const volunteer = doc.data();
+				if (volunteer.volunteerArea && volunteer.volunteerArea.includes(editAreaId)) {
+					const updatedVolunteerAreas = volunteer.volunteerArea.map(area =>
+						area === editAreaId ? updatedArea.id : area
+					);
+					batch.update(doc.ref, { volunteerArea: updatedVolunteerAreas });
+				}
+			});
+	
+			await batch.commit();
 		} else {
 			await setDoc(doc(db, "Volunteer Areas", updatedArea.id), updatedArea);
 		}
+	
 		setEditAreaId(null);
 		fetchVolunteerAreas();
 		setMessage('התחום התנדבות עודכן בהצלחה');
@@ -168,7 +189,7 @@ const AdminPage2: React.FC = () => {
 	};
 
 	const handleAddArea = async () => {
-		if (!newArea.id || !newArea.withKids || !newArea.whatsAppLink) {
+		if (!newArea.id || newArea.withKids === undefined || !newArea.whatsAppLink) {
 			setMessage('נא למלא את כל השדות.');
 			setTimeout(() => {
 				setMessage(null);
@@ -192,47 +213,84 @@ const AdminPage2: React.FC = () => {
 		}
 	};
 
-    const handleApprove = async (volunteerId: string) => {
-        try {
-            const querySnapshot = await getDocs(collection(db, "Volunteers"));
-            const volunteerDoc = querySnapshot.docs.find(doc => doc.data().id === volunteerId);
     
-            if (volunteerDoc) {
-                const volunteerData = volunteerDoc.data();
-                const response = await fetch('http://localhost:3003/api/approve-volunteer', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(volunteerData),
+
+const handleApprove = async (volunteerId: string) => {
+    try {
+        console.log("Fetching volunteers...");
+        const querySnapshot = await getDocs(collection(db, "Volunteers"));
+        console.log("Volunteers fetched successfully.");
+
+        const volunteerDoc = querySnapshot.docs.find(doc => doc.data().id === volunteerId);
+        if (volunteerDoc) {
+            const volunteerData = volunteerDoc.data();
+            console.log("Volunteer found:", volunteerData);
+
+            const arr = [
+                volunteerData.firstName,
+                volunteerData.lastName,
+                volunteerData.id,
+                volunteerData.email,
+                volunteerData.phone,
+                volunteerData.volunteerArea[0]
+            ];
+            console.log("Array created:", arr);
+
+            setMessage("...המתן, מאשר מתנדב");
+            const response = await fetch('http://localhost:5000/generate_pdf', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ arr }),
+            });
+            console.log("PDF generation request sent.");
+
+            if (response.ok) {
+                console.log("PDF generated successfully.");
+                setVolunteers(prevVolunteers => prevVolunteers.map(volunteer =>
+                    volunteer.id === volunteerId ? { ...volunteer, confirmed: true } : volunteer
+                ));
+
+                // העלאת הקובץ ל-Firestorage
+                const storage = getStorage();
+                const pdfBlob = await response.blob();
+                const storageRef = ref(storage, `BituahLeumiForms/${arr[2]}.pdf`);
+                await uploadBytes(storageRef, pdfBlob);
+                const pdfURL = await getDownloadURL(storageRef);
+
+                // עדכון המתנדב עם URL של ה-PDF
+                await updateDoc(doc(db, "Volunteers", volunteerDoc.id), {
+                    confirmed: true,
+                    BLform: pdfURL
                 });
-    
-                if (response.ok) {
-                    await updateDoc(doc(db, "Volunteers", volunteerDoc.id), {
-                        confirmed: true
-                    });
-                    setVolunteers(prevVolunteers => prevVolunteers.map(volunteer =>
-                        volunteer.id === volunteerId ? { ...volunteer, confirmed: true } : volunteer
-                    ));
-                    setMessage("המתנדב אושר בהצלחה!");
-                    setTimeout(() => {
-                        setMessage(null);
-                    }, 2500);
-                } else {
-                    setMessage('Failed to approve volunteer');
-                    setTimeout(() => {
-                        setMessage(null);
-                    }, 2500);
-                }
+                console.log("Volunteer confirmed in Firestore.");
+                setMessage("המתנדב אושר בהצלחה! PDF נוצר והועלה בהצלחה.");
+            } else {
+                console.error("Error in PDF generation:", response.statusText);
+                setMessage("שגיאה ביצירת ה-PDF.");
             }
-        } catch (error) {
-            setMessage("שגיאה באישור המתנדב.");
+
+            setTimeout(() => {
+                setMessage(null);
+            }, 2500);
+        } else {
+            console.error("Volunteer not found.");
+            setMessage("מתנדב לא נמצא.");
             setTimeout(() => {
                 setMessage(null);
             }, 2500);
         }
-    };
-    
+    } catch (error) {
+        console.error("Error in handleApprove:", error);
+        setMessage("שגיאה באישור המתנדב.");
+        setTimeout(() => {
+            setMessage(null);
+        }, 2500);
+    }
+};
+
+	
     
 
 	const handleReject = async (volunteerId: string) => {
@@ -258,7 +316,9 @@ const AdminPage2: React.FC = () => {
 
 	return (
 		<div>
-			<div className="header">
+			<body>
+				<div className="wrapper">
+					<div className="header">
 			    <h2 className="header-title">דף מנהל - מינהל קהילתי לב העיר</h2>
 				<img 
                  src="logo2.jpg" 
@@ -266,9 +326,10 @@ const AdminPage2: React.FC = () => {
                  className="logo" 
                  onClick={() => setSelectedMenu('statistics')} // הוספת אירוע קליק ללוגו
                 />
-			</div>
-
-			<div className="row">
+					</div>
+		
+					<div className="container">
+						<div className="row">
 				<div className="column middle">
 
 					{message && <div className="message">{message}</div>}
@@ -390,35 +451,44 @@ const AdminPage2: React.FC = () => {
 					)}
 
 
-					{selectedVolunteer && (
-						<div className="modal" style={{ display: 'flex' }}>
-							<div className="modal-content">
-								<div className="modal-header">
-									<h4>{selectedVolunteer.firstName + ' ' + selectedVolunteer.lastName}</h4>
-								</div>
-								<div className="modal-body">
-									<p>מס' תעודת זהות: {selectedVolunteer.id}</p>
-									<p>Email: {selectedVolunteer.email}</p>
-									<p>מין: {selectedVolunteer.gender === 'F' ? 'נקבה' : 'זכר'}</p>
-									<p>טלפון: {selectedVolunteer.phone}</p>
-									<p>תאריך התחלה: {selectedVolunteer.startDate?.toDate().toLocaleDateString("he-IL")}</p>
-									<p>תחומי התנדבות: {selectedVolunteer.volunteerArea?.join(', ')}</p>
-									<p>אושר: {selectedVolunteer.confirmed ? 'כן' : 'לא'}</p>
-									{selectedVolunteer.policeForm && (
-										<p>
-											אישור היעדר עבירות מין:{' '}
-											<a href={selectedVolunteer.policeForm} target="_blank" rel="noopener noreferrer">
-												צפה בטופס
-											</a>
-										</p>
-									)}
-								</div>
-								<div className="modal-footer">
-									<button className="action-button" onClick={closeModal}>סגור</button>
-								</div>
-							</div>
-						</div>
-					)}
+{selectedVolunteer && (
+    <div className="modal" style={{ display: 'flex' }}>
+        <div className="modal-content">
+            <div className="modal-header">
+                <h4>{selectedVolunteer.firstName + ' ' + selectedVolunteer.lastName}</h4>
+            </div>
+            <div className="modal-body">
+                <p>מס' תעודת זהות: {selectedVolunteer.id}</p>
+                <p>Email: {selectedVolunteer.email}</p>
+                <p>מין: {selectedVolunteer.gender === 'F' ? 'נקבה' : 'זכר'}</p>
+                <p>טלפון: {selectedVolunteer.phone}</p>
+                <p>תאריך התחלה: {selectedVolunteer.startDate?.toDate().toLocaleDateString("he-IL")}</p>
+                <p>תחומי התנדבות: {selectedVolunteer.volunteerArea?.join(', ')}</p>
+                <p>אושר: {selectedVolunteer.confirmed ? 'כן' : 'לא'}</p>
+                {selectedVolunteer.policeForm && (
+                    <p>
+                        אישור היעדר עבירות מין:{' '}
+                        <a href={selectedVolunteer.policeForm} target="_blank" rel="noopener noreferrer">
+                            צפה בטופס
+                        </a>
+                    </p>
+                )}
+                {selectedVolunteer.BLform && (
+                    <p>
+                        טופס ביטוח לאומי:{' '}
+                        <a href={selectedVolunteer.BLform} target="_blank" rel="noopener noreferrer">
+                            צפה בטופס
+                        </a>
+                    </p>
+                )}
+            </div>
+            <div className="modal-footer">
+                <button className="action-button" onClick={closeModal}>סגור</button>
+            </div>
+        </div>
+    </div>
+)}
+
 
 					{selectedMenu === 'editVolunteerAreas' && (
 						<>
@@ -597,10 +667,14 @@ const AdminPage2: React.FC = () => {
 						<li onClick={() => setSelectedMenu('statistics')}>נתוני המינהל</li>
 					</ul>
 				</div>
-			</div>
-			<div className="footer">
+						</div>
+					</div>
+					
+					<div className="footer">
              <a href="https://www.levhair.org.il/index.php">חזרה לאתר המינהל</a>
-            </div>
+            		</div>
+				</div>
+			</body>
 		</div>
 	);
 };
