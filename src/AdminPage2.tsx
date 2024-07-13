@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './AdminPage2.css';
 import { db } from './firebase';
-import { collection, getDocs, deleteDoc, updateDoc,writeBatch, doc, setDoc} from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, updateDoc,writeBatch, doc, setDoc, getDoc} from 'firebase/firestore';
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, BarElement, Tooltip, Legend, CategoryScale, LinearScale } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -215,80 +215,110 @@ const AdminPage2: React.FC = () => {
 
     
 
-const handleApprove = async (volunteerId: string) => {
-    try {
-        console.log("Fetching volunteers...");
-        const querySnapshot = await getDocs(collection(db, "Volunteers"));
-        console.log("Volunteers fetched successfully.");
+	const handleApprove = async (volunteerId: string) => {
+		try {
+			console.log("Fetching volunteers...");
+			const querySnapshot = await getDocs(collection(db, "Volunteers"));
+			console.log("Volunteers fetched successfully.");
+	
+			const volunteerDoc = querySnapshot.docs.find(doc => doc.data().id === volunteerId);
+			if (volunteerDoc) {
+				const volunteerData = volunteerDoc.data();
+				console.log("Volunteer found:", volunteerData);
+	
+				const arr = [
+					volunteerData.firstName,
+					volunteerData.lastName,
+					volunteerData.id,
+					volunteerData.email,
+					volunteerData.phone,
+					volunteerData.volunteerArea[0]
+				];
+				console.log("Array created:", arr);
+	
+				// Fetch the volunteer area document
+				const volunteerAreaDoc = await getDoc(doc(db, "Volunteer Areas", volunteerData.volunteerArea[0]));
+				if (!volunteerAreaDoc.exists()) {
+					console.error("Volunteer area not found.");
+					setMessage("תחום ההתנדבות לא נמצא.");
+					setTimeout(() => {
+						setMessage(null);
+					}, 2500);
+					return;
+				}
+				const volunteerAreaData = volunteerAreaDoc.data();
+				const whatsAppLink = volunteerAreaData.whatsAppLink;
+				
+				setMessage("...המתן, מאשר מתנדב");
+				const response = await fetch('http://localhost:5000/generate_pdf', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ arr }),
+				});
+				console.log("PDF generation request sent.");
+	
+				if (response.ok) {
+					console.log("PDF generated successfully.");
+					const pdfBlob = await response.blob();
+					const pdfURL = URL.createObjectURL(pdfBlob);
+					const pdfPath = `C:/BituahLeumiForms/${arr[2]}.pdf`; // עדכן לנתיב המדויק בו נשמר הקובץ
+					
+					setVolunteers(prevVolunteers => prevVolunteers.map(volunteer =>
+						volunteer.id === volunteerId ? { ...volunteer, confirmed: true } : volunteer
+					));
+	
+					// העלאת הקובץ ל-Firestorage
+					const storage = getStorage();
+					const storageRef = ref(storage, `BituahLeumiForms/${arr[2]}.pdf`);
+					await uploadBytes(storageRef, pdfBlob);
+					const downloadURL = await getDownloadURL(storageRef);
+	
+					// עדכון המתנדב עם URL של ה-PDF
+					await updateDoc(doc(db, "Volunteers", volunteerDoc.id), {
+						confirmed: true,
+						BLform: downloadURL
+					});
+					console.log("Volunteer confirmed in Firestore.");
+					setMessage("המתנדב אושר בהצלחה! PDF נוצר והועלה בהצלחה.");
+	
+					// שליחת אימייל למתנדב עם הקובץ PDF ולינק לקבוצת הוואטסאפ
+					await fetch('http://localhost:5000/approve_volunteer', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({ email: volunteerData.email, pdf_path: pdfPath, whatsAppLink }),
+					});
+					console.log("Email sent successfully.");
+					
+				} else {
+					console.error("Error in PDF generation:", response.statusText);
+					setMessage("שגיאה ביצירת ה-PDF.");
+				}
+	
+				setTimeout(() => {
+					setMessage(null);
+				}, 2500);
+			} else {
+				console.error("Volunteer not found.");
+				setMessage("מתנדב לא נמצא.");
+				setTimeout(() => {
+					setMessage(null);
+				}, 2500);
+			}
+		} catch (error) {
+			console.error("Error in handleApprove:", error);
+			setMessage("שגיאה באישור המתנדב.");
+			setTimeout(() => {
+				setMessage(null);
+			}, 2500);
+		}
+	};
+	
 
-        const volunteerDoc = querySnapshot.docs.find(doc => doc.data().id === volunteerId);
-        if (volunteerDoc) {
-            const volunteerData = volunteerDoc.data();
-            console.log("Volunteer found:", volunteerData);
-
-            const arr = [
-                volunteerData.firstName,
-                volunteerData.lastName,
-                volunteerData.id,
-                volunteerData.email,
-                volunteerData.phone,
-                volunteerData.volunteerArea[0]
-            ];
-            console.log("Array created:", arr);
-
-            setMessage("...המתן, מאשר מתנדב");
-            const response = await fetch('http://localhost:5000/generate_pdf', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ arr }),
-            });
-            console.log("PDF generation request sent.");
-
-            if (response.ok) {
-                console.log("PDF generated successfully.");
-                setVolunteers(prevVolunteers => prevVolunteers.map(volunteer =>
-                    volunteer.id === volunteerId ? { ...volunteer, confirmed: true } : volunteer
-                ));
-
-                // העלאת הקובץ ל-Firestorage
-                const storage = getStorage();
-                const pdfBlob = await response.blob();
-                const storageRef = ref(storage, `BituahLeumiForms/${arr[2]}.pdf`);
-                await uploadBytes(storageRef, pdfBlob);
-                const pdfURL = await getDownloadURL(storageRef);
-
-                // עדכון המתנדב עם URL של ה-PDF
-                await updateDoc(doc(db, "Volunteers", volunteerDoc.id), {
-                    confirmed: true,
-                    BLform: pdfURL
-                });
-                console.log("Volunteer confirmed in Firestore.");
-                setMessage("המתנדב אושר בהצלחה! PDF נוצר והועלה בהצלחה.");
-            } else {
-                console.error("Error in PDF generation:", response.statusText);
-                setMessage("שגיאה ביצירת ה-PDF.");
-            }
-
-            setTimeout(() => {
-                setMessage(null);
-            }, 2500);
-        } else {
-            console.error("Volunteer not found.");
-            setMessage("מתנדב לא נמצא.");
-            setTimeout(() => {
-                setMessage(null);
-            }, 2500);
-        }
-    } catch (error) {
-        console.error("Error in handleApprove:", error);
-        setMessage("שגיאה באישור המתנדב.");
-        setTimeout(() => {
-            setMessage(null);
-        }, 2500);
-    }
-};
+	
 
 	
     
