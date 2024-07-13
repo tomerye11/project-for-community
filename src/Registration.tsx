@@ -58,7 +58,7 @@ const Registration = () => {
 
 		if (name === 'firstName' || name === 'lastName') {
 			if (!isValidName(value)) {
-				setError('שם פרטי ושם משפחה יכולים לכלול אותיות בלבד.');
+				setError('.שם פרטי ושם משפחה לא תקינים');
 			} else {
 				setError('');
 			}
@@ -66,7 +66,7 @@ const Registration = () => {
 
 		if (name === 'id') {
 			if (!isValidId(value)) {
-				setError('תעודת זהות חייבת לכלול 9 ספרות בלבד.');
+				setError('.מספר תעודת זהות לא תקין');
 			} else {
 				setError('');
 			}
@@ -74,7 +74,7 @@ const Registration = () => {
 
 		if (name === 'phone') {
 			if (!isValidPhone(value)) {
-				setError('מספר טלפון חייב להתחיל ב-05, לכלול 10 ספרות ומספרים בלבד.');
+				setError('.מספר טלפון לא תקין');
 			} else {
 				setError('');
 			}
@@ -82,7 +82,7 @@ const Registration = () => {
 
 		if (name === 'email') {
 			if (!isValidEmail(value)) {
-				setError('כתובת מייל חייבת להיות באנגלית בלבד.');
+				setError('.כתובת מייל לא תקינה');
 			} else {
 				setError('');
 			}
@@ -122,32 +122,32 @@ const Registration = () => {
 		e.preventDefault();
 
 		if (!isValidName(formData.firstName)) {
-			setError('שם פרטי יכול לכלול אותיות בלבד.');
+			setError('.שם פרטי לא תקין');
 			return;
 		}
 
 		if (!isValidName(formData.lastName)) {
-			setError('שם משפחה יכול לכלול אותיות בלבד.');
+			setError('.שם משפחה לא תקין');
 			return;
 		}
 
 		if (!isValidId(formData.id)) {
-			setError('תעודת זהות חייבת לכלול 9 ספרות בלבד.');
+			setError('.מספר תעודת זהות לא תקין');
 			return;
 		}
 
 		if (!isValidPhone(formData.phone)) {
-			setError('מספר טלפון חייב להתחיל ב-05 ולכלול 10 ספרות.');
+			setError('.מספר טלפון לא תקין');
 			return;
 		}
 
 		if (!isValidEmail(formData.email)) {
-			setError('כתובת מייל חייבת להיות תקינה ובאנגלית בלבד.');
+			setError('.כתובת מייל לא תקינה');
 			return;
 		}
 
 		if (withKids && formData.gender === 'Male' && (!formData.policeApproval || formData.policeApproval.type !== 'application/pdf')) {
-			setError('Police Approval file is required and must be a PDF.');
+			setError('אנא העלה קובץ מסוג PDF בלבד.');
 			return;
 		}
 
@@ -216,8 +216,8 @@ const Registration = () => {
 					confirmed: false,
 					policeForm: policeFormURL,
 				});
-				console.log('Volunteer added successfully!'); // Debugging line
-				alert('Volunteer added successfully!');
+				
+				alert('טופס נשלח בהצלחה');
 			} catch (error) {
 				console.error('Error adding document: ', error);
 				setError(`Failed to add volunteer. Error: ${error.message}`);
@@ -240,8 +240,7 @@ const Registration = () => {
 						Form: [policeFormURL]
 					});
 				}
-				console.log('Police approval added to Police Forms collection'); // Debugging line
-				alert('Police approval uploaded successfully!');
+				
 			} catch (error) {
 				console.error('Error updating police forms: ', error);
 				setError(`Failed to update police forms. Error: ${error.message}`);

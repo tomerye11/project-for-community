@@ -6,6 +6,7 @@ import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, BarElement, Tooltip, Legend, CategoryScale, LinearScale } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import * as XLSX from 'xlsx';
 
 
 ChartJS.register(ArcElement, BarElement, Tooltip, Legend, CategoryScale, LinearScale, ChartDataLabels);
@@ -86,6 +87,28 @@ const AdminPage2: React.FC = () => {
 
 		fetchData();
 	}, [selectedMenu]);
+
+	const exportToExcel = () => {
+		const confirmedVolunteers = volunteers
+			.filter(volunteer => volunteer.confirmed)
+			.map(volunteer => ({
+				'מספר תעודת זהות': volunteer.id,
+				'שם פרטי': volunteer.firstName,
+				'שם משפחה': volunteer.lastName,
+				'כתובת מייל': volunteer.email,
+				'מספר טלפון': volunteer.phone,
+				'מין': volunteer.gender,
+				'תאריך התחלה': volunteer.startDate ? volunteer.startDate.toDate().toLocaleDateString("he-IL") : '',
+				'תחום התנדבות': volunteer.volunteerArea ? volunteer.volunteerArea.join(', ') : ''
+			}));
+	
+		
+		const ws = XLSX.utils.json_to_sheet(confirmedVolunteers);
+		const wb = XLSX.utils.book_new();
+		XLSX.utils.book_append_sheet(wb, ws, 'Confirmed Volunteers');
+	
+		XLSX.writeFile(wb, 'ConfirmedVolunteers.xlsx');
+	};
 
 	const fetchVolunteerAreas = async () => {
 		const querySnapshot = await getDocs(collection(db, "Volunteer Areas"));
@@ -239,8 +262,7 @@ const AdminPage2: React.FC = () => {
 				// Fetch the volunteer area document
 				const volunteerAreaDoc = await getDoc(doc(db, "Volunteer Areas", volunteerData.volunteerArea[0]));
 				if (!volunteerAreaDoc.exists()) {
-					console.error("Volunteer area not found.");
-					setMessage("תחום ההתנדבות לא נמצא.");
+					setMessage(".תחום התנדבות לא נמצא");
 					setTimeout(() => {
 						setMessage(null);
 					}, 2500);
@@ -268,8 +290,9 @@ const AdminPage2: React.FC = () => {
 					setVolunteers(prevVolunteers => prevVolunteers.map(volunteer =>
 						volunteer.id === volunteerId ? { ...volunteer, confirmed: true } : volunteer
 					));
-	
+
 					// העלאת הקובץ ל-Firestorage
+					setMessage("...המתן, יוצר קובץ ביטוח לאומי");
 					const storage = getStorage();
 					const storageRef = ref(storage, `BituahLeumiForms/${arr[2]}.pdf`);
 					await uploadBytes(storageRef, pdfBlob);
@@ -281,9 +304,10 @@ const AdminPage2: React.FC = () => {
 						BLform: downloadURL
 					});
 					console.log("Volunteer confirmed in Firestore.");
-					setMessage("המתנדב אושר בהצלחה! PDF נוצר והועלה בהצלחה.");
+					
 	
 					// שליחת אימייל למתנדב עם הקובץ PDF ולינק לקבוצת הוואטסאפ
+					setMessage("...המתן, שולח מייל אישור");
 					await fetch('http://localhost:5000/approve_volunteer', {
 						method: 'POST',
 						headers: {
@@ -292,6 +316,8 @@ const AdminPage2: React.FC = () => {
 						body: JSON.stringify({ email: volunteerData.email, pdf_path: pdfPath, whatsAppLink }),
 					});
 					console.log("Email sent successfully.");
+					setMessage("!המתנדב אושר בהצלחה");
+	
 					
 				} else {
 					console.error("Error in PDF generation:", response.statusText);
@@ -455,6 +481,7 @@ const AdminPage2: React.FC = () => {
 					{selectedMenu === 'volunteerTable' && (
 						<>
 							<h3 className="large-margin-bottom">טבלת מתנדבים מאושרים</h3>
+							<button onClick={exportToExcel}>ייצוא לאקסל</button>
 							<table>
 								<thead>
 									<tr>
@@ -527,8 +554,8 @@ const AdminPage2: React.FC = () => {
 								<thead>
 									<tr>
 										<th>פעולות</th>
-										<th>עם ילדים</th>
-										<th>לינק</th>
+										<th>התנדבות עם ילדים</th>
+										<th>לינק לקבוצת הוואסטאפ</th>
 										<th>שם</th>
 									</tr>
 								</thead>

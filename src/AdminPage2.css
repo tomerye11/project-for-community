@@ -67,7 +67,7 @@
     width: 20%;
     display: flex;
     flex-direction: column;
-    border-bottom: 2px solid #00237a; 
+    /* border-bottom: 2px solid #00237a;  */
     font-size: larger; 
 }
 
@@ -78,7 +78,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center; /* Center vertically */
-    border-bottom: 2px solid #00237a; /* Add bottom border */
+    /* border-bottom: 2px solid #00237a; Add bottom border */
     /* margin-left: 10.5%; */
     text-align: right;
     align-items: center;
@@ -299,6 +299,7 @@ input[type="radio"] {
 }
 
 .footer {
+    font-family: 'OS Aran W FFC 500', sans-serif;
     flex-shrink: 0; /* Ensure the footer does not shrink */
     background-color: #00237a; 
     text-align: center;
