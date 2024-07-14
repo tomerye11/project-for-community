@@ -45,7 +45,7 @@
     width: 100%;
 }
 
-.login input {
+.login input[type="text"], .login input[type="password"] {
     width: 75%;
     padding: 6px 10px;
     margin: 5px 0;
@@ -53,6 +53,7 @@
     box-sizing: border-box;
     text-align: right;
 }
+
 
 .login button {
     background: #00237a;

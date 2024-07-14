@@ -8,6 +8,8 @@ import os
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import pythoncom
+import win32com.client
 
 app = Flask(__name__)
 CORS(app)  # Add this line to enable CORS for all routes
@@ -38,7 +40,15 @@ def replace_text_in_docx(arr, docx_path, output_path):
         replace_text_in_table(table, replacements)
     temp_docx_path = output_path.replace('.pdf', '_temp.docx')
     doc.save(temp_docx_path)
-    convert(temp_docx_path, output_path)
+    
+    # Initialize COM
+    pythoncom.CoInitialize()
+    try:
+        convert(temp_docx_path, output_path)
+    finally:
+        # Uninitialize COM
+        pythoncom.CoUninitialize()
+    
     os.remove(temp_docx_path)
 
 @app.route('/generate_pdf', methods=['POST'])
@@ -123,6 +133,5 @@ def approve_volunteer():
 
     return jsonify({'status': 'success', 'message': 'Volunteer approved and email sent'})
 
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=5008)

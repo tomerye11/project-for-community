@@ -272,7 +272,7 @@ const AdminPage2: React.FC = () => {
 				const whatsAppLink = volunteerAreaData.whatsAppLink;
 				
 				setMessage("...המתן, מאשר מתנדב");
-				const response = await fetch('http://localhost:5001/generate_pdf', {
+				const response = await fetch('http://localhost:5008/generate_pdf', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -308,7 +308,7 @@ const AdminPage2: React.FC = () => {
 	
 					// שליחת אימייל למתנדב עם הקובץ PDF ולינק לקבוצת הוואטסאפ
 					setMessage("...המתן, שולח מייל אישור");
-					await fetch('http://localhost:5001/approve_volunteer', {
+					await fetch('http://localhost:5008/approve_volunteer', {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',

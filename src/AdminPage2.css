@@ -136,7 +136,7 @@ ul.menu li:hover {
 }
 
 table {
-    width: 80%; /* Adjust the width to fit the content */
+    width: 100%; /* Adjust the width to fit the content */
     border-collapse: collapse;
     margin: 20px 0;
     font-size: 16px;
