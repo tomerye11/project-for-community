@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './AdminPage2.css';
 import { db } from './firebase';
-import { collection, getDocs, deleteDoc, updateDoc,writeBatch, doc, setDoc, getDoc} from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, updateDoc,writeBatch, doc, setDoc, getDoc, query, where, DocumentData, Query} from 'firebase/firestore';
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, BarElement, Tooltip, Legend, CategoryScale, LinearScale } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -21,6 +21,10 @@ const AdminPage2: React.FC = () => {
 	const [volunteerStats, setVolunteerStats] = useState<{ [key: string]: number }>({});
 	const [totalVolunteers, setTotalVolunteers] = useState<number>(0);
 	const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
+	const [searchTerm, setSearchTerm] = useState('');
+    const [searchType, setSearchType] = useState('name');
+	const [searchResults, setSearchResults] = useState<any[]>([]);
+	const [volunteers, setVolunteers] = useState<any[]>([]);
 
 	interface Volunteer {
 		id: string;
@@ -35,8 +39,6 @@ const AdminPage2: React.FC = () => {
 		policeForm?: string; 
 		BLform?: string;
 	}
-
-	const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
 
 	const handleDetailsClick = (volunteer: Volunteer) => {
 		console.log("Volunteer details clicked: ", volunteer); // בדיקת הקונסולה
@@ -87,6 +89,109 @@ const AdminPage2: React.FC = () => {
 
 		fetchData();
 	}, [selectedMenu]);
+
+	const fetchVolunteers = async () => {
+		const volunteersRef = collection(db, 'Volunteers');
+		const q = query(volunteersRef, where('confirmed', '==', true));
+		const querySnapshot = await getDocs(q);
+		let volunteerList: any[] = [];
+		querySnapshot.forEach((doc) => {
+		  volunteerList.push({ id: doc.id, ...doc.data() });
+		});
+		setVolunteers(volunteerList);
+	  };
+	
+	  useEffect(() => {
+		fetchVolunteers();
+		fetchVolunteerAreas();
+	  }, []);
+
+	  useEffect(() => {
+		handleSearch();
+	  }, [searchTerm, searchType]);
+	
+	  const handleSearch = async () => {
+		const volunteersRef = collection(db, 'Volunteers');
+		let searchResults = [];
+	  
+		if (searchTerm === '') {
+		  setSearchResults([]);
+		  return;
+		}
+	  
+		if (searchType === 'name') {
+		  const terms = searchTerm.split(' ').map(term => term.trim()).filter(term => term);
+	  
+		  const queries = terms.flatMap(term => [
+			query(volunteersRef, where('firstName', '>=', term), where('firstName', '<=', term + '\uf8ff')),
+			query(volunteersRef, where('lastName', '>=', term), where('lastName', '<=', term + '\uf8ff'))
+		  ]);
+	  
+		  const snapshots = await Promise.all(queries.map(q => getDocs(q)));
+	  
+		  const resultsMap = new Map();
+		  snapshots.forEach(snapshot => {
+			snapshot.forEach(doc => {
+			  const docData = { id: doc.id, ...doc.data() };
+			  const key = doc.id;
+			  if (!resultsMap.has(key)) {
+				resultsMap.set(key, docData);
+			  }
+			});
+		  });
+	  
+		  searchResults = Array.from(resultsMap.values());
+	  
+		  // Filter relevant results
+		  searchResults = searchResults.filter(result => {
+			const fullName = `${result.firstName} ${result.lastName}`;
+			return terms.every(term => fullName.includes(term));
+		  });
+	  
+		} else if (searchType === 'id') {
+		  const idQuery = query(volunteersRef, where('id', '>=', searchTerm), where('id', '<=', searchTerm + '\uf8ff'));
+		  const querySnapshot = await getDocs(idQuery);
+		  querySnapshot.forEach((doc) => {
+			searchResults.push({ id: doc.id, ...doc.data() });
+		  });
+		} else if (searchType === 'volunteerArea') {
+		  const areaQuery = query(volunteersRef, where('volunteerArea', 'array-contains', searchTerm));
+		  const querySnapshot = await getDocs(areaQuery);
+		  querySnapshot.forEach((doc) => {
+			searchResults.push({ id: doc.id, ...doc.data() });
+		  });
+		}
+	  
+		setSearchResults(searchResults);
+	  };
+
+	  useEffect(() => {
+		fetchVolunteerAreas();
+	  }, []);
+	
+	  useEffect(() => {
+		handleSearchArea();
+	  }, [searchTerm]);
+	
+	
+	  const handleSearchArea = async () => {
+		const volunteerAreasRef = collection(db, 'Volunteer Areas');
+		let searchResults = [];
+	
+		if (searchTerm === '') {
+		  setSearchResults(volunteerAreas);
+		  return;
+		}
+	
+		const areaQuery = query(volunteerAreasRef, where('id', '>=', searchTerm), where('id', '<=', searchTerm + '\uf8ff'));
+		const querySnapshot = await getDocs(areaQuery);
+		querySnapshot.forEach((doc) => {
+		  searchResults.push({ id: doc.id, ...(doc.data()) });
+		});
+	
+		setSearchResults(searchResults);
+	  };
+	
 
 	const exportToExcel = () => {
 		const confirmedVolunteers = volunteers
@@ -473,34 +578,76 @@ const AdminPage2: React.FC = () => {
 						</div>
 					)}
 
-					{selectedMenu === 'volunteerTable' && (
-						<>
-							<h3 className="large-margin-bottom">טבלת מתנדבים מאושרים</h3>
-							<button onClick={exportToExcel}>ייצוא לאקסל</button>
-							<table>
-								<thead>
-									<tr>
-										<th>פרטים</th>
-										<th>מס' תעודת זהות</th>
-										<th>שם</th>
-									</tr>
-								</thead>
-								<tbody>
-									{volunteers
-										.filter(volunteer => volunteer.confirmed) // סינון המתנדבים שהשדה confirmed שלהם true
-										.map(volunteer => (
-											<tr key={volunteer.id}>
-												<td>
-													<button className="action-button" onClick={() => handleDetailsClick(volunteer)}>הצג פרטים</button>
-												</td>
-												<td>{volunteer.id}</td>
-												<td>{volunteer.firstName} {volunteer.lastName}</td>
-											</tr>
-										))}
-								</tbody>
-							</table>
-						</>
-					)}
+{selectedMenu === 'volunteerTable' && (
+  <>
+    <h3 className="large-margin-bottom">טבלת מתנדבים מאושרים</h3>
+    <div className="search-container">
+      <button className="export-button" onClick={exportToExcel}>ייצוא לאקסל</button>
+      <div className="search-box">
+        <select 
+          value={searchType} 
+          onChange={(e) => setSearchType(e.target.value)} 
+          className="search-select"
+        >
+          <option value="name">שם</option>
+          <option value="id">תעודת זהות</option>
+          <option value="volunteerArea">תחום התנדבות</option>
+        </select>
+        {searchType === 'volunteerArea' ? (
+          <select 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)} 
+            className="search-select"
+          >
+            <option value="">בחר תחום התנדבות</option>
+            {volunteerAreas.map(area => (
+              <option key={area.id} value={area.id}>{area.id}</option>
+            ))}
+          </select>
+        ) : (
+          <input 
+            type="text" 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)} 
+            placeholder="חיפוש"
+            className="search-input"
+          />
+        )}
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>פרטים</th>
+          <th>תחום התנדבות</th>
+          <th>מס' תעודת זהות</th>
+          <th>שם</th>
+        </tr>
+      </thead>
+      <tbody>
+        {searchResults.length === 0 && searchTerm ? (
+          <tr>
+            <td colSpan={4}>לא נמצאו מתנדבים</td>
+          </tr>
+        ) : (
+          (searchResults.length > 0 ? searchResults : volunteers)
+            .filter(volunteer => volunteer.confirmed) // סינון המתנדבים שהשדה confirmed שלהם true
+            .map(volunteer => (
+              <tr key={volunteer.id}>
+                <td>
+                  <button className="action-button" onClick={() => handleDetailsClick(volunteer)}>הצג פרטים</button>
+                </td>
+                <td>{volunteer.volunteerArea}</td>
+                <td>{volunteer.id}</td>
+                <td>{volunteer.firstName} {volunteer.lastName}</td>
+              </tr>
+            ))
+        )}
+      </tbody>
+    </table>
+  </>
+)}
+
 
 
 {selectedVolunteer && (
@@ -542,89 +689,98 @@ const AdminPage2: React.FC = () => {
 )}
 
 
-					{selectedMenu === 'editVolunteerAreas' && (
-						<>
-							<h3 className="large-margin-bottom">עריכת תחומי התנדבות</h3>
-							<table>
-								<thead>
-									<tr>
-										<th>פעולות</th>
-										<th>התנדבות עם ילדים</th>
-										<th>לינק לקבוצת הוואסטאפ</th>
-										<th>שם</th>
-									</tr>
-								</thead>
-								<tbody>
-									{volunteerAreas.map(area => (
-										<tr key={area.id}>
-											<td>
-												{editAreaId === area.id ? (
-													<>
-														<button className="action-button" onClick={handleSave}>שמור</button>
-														<button className="action-button" onClick={handleCancel}>ביטול</button>
-													</>
-												) : (
-													<>
-														<button className="action-button" onClick={() => handleDelete(area.id)}>הסר</button>
-														<button className="action-button" onClick={() => handleEdit(area)}>ערוך</button>
-													</>
-												)}
-											</td>
-											{editAreaId === area.id ? (
-												<>
-													<td>
-														<label>
-															<input
-																type="radio"
-																name="withKids"
-																value="true"
-																checked={updatedArea.withKids === true}
-																onChange={handleRadioChange}
-															/>
-															כן
-														</label>
-														<label>
-															<input
-																type="radio"
-																name="withKids"
-																value="false"
-																checked={updatedArea.withKids === false}
-																onChange={handleRadioChange}
-															/>
-															לא
-														</label>
-													</td>
-													<td>
-														<input
-															type="text"
-															name="whatsAppLink"
-															value={updatedArea.whatsAppLink || ''}
-															onChange={handleInputChange}
-														/>
-													</td>
-													<td>
-														<input
-															type="text"
-															name="id"
-															value={updatedArea.id}
-															onChange={handleInputChange}
-															className="align-right"
-														/>
-													</td>
-												</>
-											) : (
-												<>
-													<td>{area.withKids ? 'כן' : 'לא'}</td>
-													<td>{area.whatsAppLink}</td>
-													<td>{area.id}</td>
-												</>
-											)}
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</>
-					)}
+{selectedMenu === 'editVolunteerAreas' && (
+        <>
+          <h3 className="large-margin-bottom">עריכת תחומי התנדבות</h3>
+          <div className="search-container2">
+            <input 
+              type="text" 
+              value={searchTerm} 
+              onChange={(e) => setSearchTerm(e.target.value)} 
+              placeholder="חפש תחום התנדבות" 
+              className="search-input2"
+            />
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>פעולות</th>
+                <th>התנדבות עם ילדים</th>
+                <th>לינק לקבוצת הוואסטאפ</th>
+                <th>שם</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(searchTerm ? searchResults : volunteerAreas).map(area => (
+                <tr key={area.id}>
+                  <td>
+                    {editAreaId === area.id ? (
+                      <>
+                        <button className="action-button" onClick={handleSave}>שמור</button>
+                        <button className="action-button" onClick={handleCancel}>ביטול</button>
+                      </>
+                    ) : (
+                      <>
+                        <button className="action-button" onClick={() => handleDelete(area.id)}>הסר</button>
+                        <button className="action-button" onClick={() => handleEdit(area)}>ערוך</button>
+                      </>
+                    )}
+                  </td>
+                  {editAreaId === area.id ? (
+                    <>
+                      <td>
+                        <label>
+                          <input
+                            type="radio"
+                            name="withKids"
+                            value="true"
+                            checked={updatedArea.withKids === true}
+                            onChange={handleRadioChange}
+                          />
+                          כן
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name="withKids"
+                            value="false"
+                            checked={updatedArea.withKids === false}
+                            onChange={handleRadioChange}
+                          />
+                          לא
+                        </label>
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          name="whatsAppLink"
+                          value={updatedArea.whatsAppLink || ''}
+                          onChange={handleInputChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          name="id"
+                          value={updatedArea.id}
+                          onChange={handleInputChange}
+                          className="align-right"
+                        />
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td>{area.withKids ? 'כן' : 'לא'}</td>
+                      <td>{area.whatsAppLink}</td>
+                      <td>{area.id}</td>
+                    </>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
 
                     {selectedMenu === 'approveVolunteers' && (
                         <>

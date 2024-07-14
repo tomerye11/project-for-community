@@ -333,3 +333,64 @@ input[type="radio"] {
     margin-bottom: 2%; /* מרווח גדול יותר מתחת לכותרת */
     margin-top: 2%; /* מרווח גדול יותר מתחת לכותרת */
   }
+
+  .search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+}
+
+.search-select,
+.search-input {
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: right;
+    height: 40px; /* הגדרת גובה זהה עבור combobox ו-textbox */
+}
+
+.search-select {
+    margin-left: 15px; /* מרווח בין ה-combobox לחיפוש */
+    font-size: 18px;
+    margin-top: 5px;
+}
+
+.search-input {
+    width: 300px; /* הגדרת רוחב */
+}
+
+.export-button {
+    background-color: #00237a;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.export-button:hover {
+    background-color: #475191;
+}
+
+.search-input2 {
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: right;
+    height: 40px;
+}
+
+.search-container2 {
+    display: flex;
+    justify-content: space-between;
+    width: 25%;
+    margin-left: auto;
+}
