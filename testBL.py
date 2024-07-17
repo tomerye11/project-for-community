@@ -133,5 +133,32 @@ def approve_volunteer():
 
     return jsonify({'status': 'success', 'message': 'Volunteer approved and email sent'})
 
+@app.route('/reject_volunteer', methods=['POST'])
+def reject_volunteer():
+    data = request.get_json()
+    volunteer_email = data.get('email')
+
+    html_message = '''
+    <!DOCTYPE html>
+    <html lang="he">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>דחיית התנדבות</title>
+    </head>
+    <body>
+        <p>שלום רב,</p>
+        <p>אנו מצטערים להודיעך כי בקשתך להתנדב נדחתה.</p>
+        <p>בברכה,</p>
+        <p>המינהל הקהילתי לב העיר</p>
+    </body>
+    </html>
+    '''
+
+    send_email(volunteer_email, 'הודעה על דחיית התנדבות', html_message)
+
+    return jsonify({'status': 'success', 'message': 'Rejection email sent successfully'})
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5008)

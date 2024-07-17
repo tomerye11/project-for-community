@@ -107,91 +107,142 @@ const AdminPage2: React.FC = () => {
 	  }, []);
 
 	  useEffect(() => {
-		handleSearch();
+		if (searchTerm !== '') {
+		  handleSearch();
+		} else {
+		  setSearchResults([]);
+		}
 	  }, [searchTerm, searchType]);
 	
-	  const handleSearch = async () => {
-		const volunteersRef = collection(db, 'Volunteers');
-		let searchResults = [];
-	  
+	  useEffect(() => {
 		if (searchTerm === '') {
-		  setSearchResults([]);
-		  return;
+		  // אם שורת החיפוש ריקה, הצג את כל המתנדבים המאושרים
+		  handleShowAllVolunteers();
+		} else {
+		  handleSearch();
 		}
+	  }, [searchTerm, searchType]);
 	  
-		if (searchType === 'name') {
-		  const terms = searchTerm.split(' ').map(term => term.trim()).filter(term => term);
+	  const handleShowAllVolunteers = async () => {
+		try {
+		  const volunteersRef = collection(db, 'Volunteers');
+		  const confirmedQuery = query(volunteersRef, where('confirmed', '==', true));
+		  const querySnapshot = await getDocs(confirmedQuery);
+		  
+		  let allVolunteers = [];
+		  querySnapshot.forEach(doc => {
+			allVolunteers.push({ id: doc.id, ...doc.data() });
+		  });
+		  
+		  setSearchResults(allVolunteers);
+		} catch (error) {
+		  console.error('Error fetching all volunteers:', error);
+		}
+	  };
 	  
-		  const queries = terms.flatMap(term => [
-			query(volunteersRef, where('firstName', '>=', term), where('firstName', '<=', term + '\uf8ff')),
-			query(volunteersRef, where('lastName', '>=', term), where('lastName', '<=', term + '\uf8ff'))
-		  ]);
+	  const handleSearch = async () => {
+		try {
+		  const volunteersRef = collection(db, 'Volunteers');
+		  let searchResults = [];
 	  
-		  const snapshots = await Promise.all(queries.map(q => getDocs(q)));
+		  console.log('Starting search with:', { searchTerm, searchType });
 	  
-		  const resultsMap = new Map();
-		  snapshots.forEach(snapshot => {
-			snapshot.forEach(doc => {
+		  // Create a query that filters only confirmed volunteers
+		  const confirmedQuery = query(volunteersRef, where('confirmed', '==', true));
+	  
+		  if (searchType === 'name') {
+			const term = searchTerm.trim();
+			console.log('Searching by name with term:', term);
+	  
+			// Query to find first names matching the term
+			const nameQuery = query(
+			  confirmedQuery,
+			  where('firstName', '>=', term),
+			  where('firstName', '<=', term + '\uf8ff')
+			);
+	  
+			// Query to find last names matching the term
+			const lastNameQuery = query(
+			  confirmedQuery,
+			  where('lastName', '>=', term),
+			  where('lastName', '<=', term + '\uf8ff')
+			);
+	  
+			// Execute both queries and wait for their results
+			const [firstNameSnapshot, lastNameSnapshot] = await Promise.all([
+			  getDocs(nameQuery),
+			  getDocs(lastNameQuery)
+			]);
+	  
+			// Use a map to combine results from both queries without duplicates
+			const resultsMap = new Map();
+			firstNameSnapshot.forEach(doc => {
 			  const docData = { id: doc.id, ...doc.data() };
-			  const key = doc.id;
-			  if (!resultsMap.has(key)) {
-				resultsMap.set(key, docData);
+			  resultsMap.set(doc.id, docData);
+			});
+	  
+			lastNameSnapshot.forEach(doc => {
+			  const docData = { id: doc.id, ...doc.data() };
+			  if (!resultsMap.has(doc.id)) {
+				resultsMap.set(doc.id, docData);
 			  }
 			});
-		  });
 	  
-		  searchResults = Array.from(resultsMap.values());
+			searchResults = Array.from(resultsMap.values());
 	  
-		  // Filter relevant results
-		  searchResults = searchResults.filter(result => {
-			const fullName = `${result.firstName} ${result.lastName}`;
-			return terms.every(term => fullName.includes(term));
-		  });
+		  } else if (searchType === 'id') {
+			console.log('Searching by ID with term:', searchTerm);
 	  
-		} else if (searchType === 'id') {
-		  const idQuery = query(volunteersRef, where('id', '>=', searchTerm), where('id', '<=', searchTerm + '\uf8ff'));
-		  const querySnapshot = await getDocs(idQuery);
-		  querySnapshot.forEach((doc) => {
-			searchResults.push({ id: doc.id, ...doc.data() });
-		  });
-		} else if (searchType === 'volunteerArea') {
-		  const areaQuery = query(volunteersRef, where('volunteerArea', 'array-contains', searchTerm));
-		  const querySnapshot = await getDocs(areaQuery);
-		  querySnapshot.forEach((doc) => {
-			searchResults.push({ id: doc.id, ...doc.data() });
-		  });
+			// Query to find IDs matching the term
+			const idQuery = query(
+			  confirmedQuery,
+			  where('id', '>=', searchTerm),
+			  where('id', '<=', searchTerm + '\uf8ff')
+			);
+			const querySnapshot = await getDocs(idQuery);
+			querySnapshot.forEach(doc => {
+			  searchResults.push({ id: doc.id, ...doc.data() });
+			});
+	  
+		  } else if (searchType === 'volunteerArea') {
+			console.log('Searching by volunteer area with term:', searchTerm);
+	  
+			// Query to find volunteer areas containing the term
+			const areaQuery = query(
+			  confirmedQuery,
+			  where('volunteerArea', 'array-contains', searchTerm)
+			);
+			const querySnapshot = await getDocs(areaQuery);
+			querySnapshot.forEach(doc => {
+			  searchResults.push({ id: doc.id, ...doc.data() });
+			});
+		  }
+	  
+		  console.log('Search results:', searchResults);
+		  setSearchResults(searchResults);
+		} catch (error) {
+		  console.error('Error searching volunteers:', error);
 		}
+	  };
 	  
-		setSearchResults(searchResults);
-	  };
-
-	  useEffect(() => {
-		fetchVolunteerAreas();
-	  }, []);
-	
-	  useEffect(() => {
-		handleSearchArea();
-	  }, [searchTerm]);
-	
-	
-	  const handleSearchArea = async () => {
-		const volunteerAreasRef = collection(db, 'Volunteer Areas');
-		let searchResults = [];
-	
-		if (searchTerm === '') {
-		  setSearchResults(volunteerAreas);
-		  return;
+	  const handleDeleteVolunteer = async (volunteerId) => {
+		try {
+		  const volunteersRef = collection(db, 'Volunteers');
+		  const querySnapshot = await getDocs(query(volunteersRef, where('id', '==', volunteerId)));
+		  
+		  if (!querySnapshot.empty) {
+			const docId = querySnapshot.docs[0].id; // קבל את מזהה המסמך הראשון מהתוצאות
+			await deleteDoc(doc(db, 'Volunteers', docId));
+			// רענן את הרשימה לאחר המחיקה
+			handleShowAllVolunteers();
+		  } else {
+			console.error('Volunteer not found');
+		  }
+		} catch (error) {
+		  console.error('Error deleting volunteer:', error);
 		}
-	
-		const areaQuery = query(volunteerAreasRef, where('id', '>=', searchTerm), where('id', '<=', searchTerm + '\uf8ff'));
-		const querySnapshot = await getDocs(areaQuery);
-		querySnapshot.forEach((doc) => {
-		  searchResults.push({ id: doc.id, ...(doc.data()) });
-		});
-	
-		setSearchResults(searchResults);
 	  };
-	
+	  
 
 	const exportToExcel = () => {
 		const confirmedVolunteers = volunteers
@@ -440,7 +491,7 @@ const AdminPage2: React.FC = () => {
 				}, 2500);
 			}
 		} catch (error) {
-			console.error("Error in handleApprove:", error);
+			console.error("Error in handleApprove:  ", error);
 			setMessage("שגיאה באישור המתנדב.");
 			setTimeout(() => {
 				setMessage(null);
@@ -449,25 +500,40 @@ const AdminPage2: React.FC = () => {
 	};
 	
 
-	const handleReject = async (volunteerId: string) => {
+	const handleReject = async (volunteerId) => {
 		try {
-			const querySnapshot = await getDocs(collection(db, "Volunteers"));
-			const volunteerDoc = querySnapshot.docs.find(doc => doc.data().id === volunteerId);
-			if (volunteerDoc) {
-				await deleteDoc(doc(db, "Volunteers", volunteerDoc.id));
-				setVolunteers(prevVolunteers => prevVolunteers.filter(volunteer => volunteer.id !== volunteerId));
-				setMessage("המתנדב נדחה בהצלחה!");
-				setTimeout(() => {
-					setMessage(null);
-				}, 2500);
-			}
-		} catch (error) {
-			setMessage("שגיאה בדחיית המתנדב.");
+		  const querySnapshot = await getDocs(collection(db, "Volunteers"));
+		  const volunteerDoc = querySnapshot.docs.find(doc => doc.data().id === volunteerId);
+	  
+		  if (volunteerDoc) {
+			const volunteerData = volunteerDoc.data();
+			
+			// שליחת בקשה לשרת Flask לשליחת אימייל דחייה
+			await fetch('http://localhost:5008/reject_volunteer', {
+			  method: 'POST',
+			  headers: {
+				'Content-Type': 'application/json',
+			  },
+			  body: JSON.stringify({ email: volunteerData.email }),
+			});
+	  
+			await deleteDoc(doc(db, "Volunteers", volunteerDoc.id));
+			setVolunteers(prevVolunteers => prevVolunteers.filter(volunteer => volunteer.id !== volunteerId));
+			setMessage("המתנדב נדחה בהצלחה!");
 			setTimeout(() => {
-				setMessage(null);
+			  setMessage(null);
 			}, 2500);
+		  } else {
+			console.error('Volunteer not found');
+		  }
+		} catch (error) {
+		  setMessage("שגיאה בדחיית המתנדב.");
+		  setTimeout(() => {
+			setMessage(null);
+		  }, 2500);
 		}
-	};
+	  };
+	  
 
 
 	return (
@@ -618,7 +684,7 @@ const AdminPage2: React.FC = () => {
     <table>
       <thead>
         <tr>
-          <th>פרטים</th>
+          <th>פעולות</th>
           <th>תחום התנדבות</th>
           <th>מס' תעודת זהות</th>
           <th>שם</th>
@@ -627,7 +693,7 @@ const AdminPage2: React.FC = () => {
       <tbody>
         {searchResults.length === 0 && searchTerm ? (
           <tr>
-            <td colSpan={4}>לא נמצאו מתנדבים</td>
+            <td colSpan={4}>לא נמצאו מתנדבים</td> {/* עדכון colspan כדי לכלול את העמודה החדשה */}
           </tr>
         ) : (
           (searchResults.length > 0 ? searchResults : volunteers)
@@ -636,8 +702,9 @@ const AdminPage2: React.FC = () => {
               <tr key={volunteer.id}>
                 <td>
                   <button className="action-button" onClick={() => handleDetailsClick(volunteer)}>הצג פרטים</button>
+                  <button className="action-button" onClick={() => handleDeleteVolunteer(volunteer.id)}>הסר</button> {/* כפתור "הסר" */}
                 </td>
-                <td>{volunteer.volunteerArea}</td>
+                <td>{Array.isArray(volunteer.volunteerArea) ? volunteer.volunteerArea.join(', ') : ''}</td>
                 <td>{volunteer.id}</td>
                 <td>{volunteer.firstName} {volunteer.lastName}</td>
               </tr>
@@ -647,6 +714,8 @@ const AdminPage2: React.FC = () => {
     </table>
   </>
 )}
+
+
 
 
 
