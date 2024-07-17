@@ -107,21 +107,17 @@ const AdminPage2: React.FC = () => {
 	  }, []);
 
 	  useEffect(() => {
-		if (searchTerm !== '') {
-		  handleSearch();
-		} else {
-		  setSearchResults([]);
+		if (selectedMenu === 'volunteerTable') {
+		  if (searchTerm !== '') {
+			handleSearch();
+		  } else {
+			handleShowAllVolunteers();
+		  }
+		} else if (selectedMenu === 'editVolunteerAreas') {
+		  handleSearchArea();
 		}
-	  }, [searchTerm, searchType]);
+	  }, [searchTerm, searchType, selectedMenu]);
 	
-	  useEffect(() => {
-		if (searchTerm === '') {
-		  // אם שורת החיפוש ריקה, הצג את כל המתנדבים המאושרים
-		  handleShowAllVolunteers();
-		} else {
-		  handleSearch();
-		}
-	  }, [searchTerm, searchType]);
 	  
 	  const handleShowAllVolunteers = async () => {
 		try {
@@ -223,6 +219,25 @@ const AdminPage2: React.FC = () => {
 		} catch (error) {
 		  console.error('Error searching volunteers:', error);
 		}
+	  };
+
+
+	  const handleSearchArea = async () => {
+		const volunteerAreasRef = collection(db, 'Volunteer Areas');
+		let searchResults = [];
+	
+		if (searchTerm === '') {
+		  setSearchResults(volunteerAreas);
+		  return;
+		}
+	
+		const areaQuery = query(volunteerAreasRef, where('id', '>=', searchTerm), where('id', '<=', searchTerm + '\uf8ff'));
+		const querySnapshot = await getDocs(areaQuery);
+		querySnapshot.forEach((doc) => {
+		  searchResults.push({ id: doc.id, ...(doc.data()) });
+		});
+	
+		setSearchResults(searchResults);
 	  };
 	  
 	  const handleDeleteVolunteer = async (volunteerId) => {
@@ -714,9 +729,6 @@ const AdminPage2: React.FC = () => {
     </table>
   </>
 )}
-
-
-
 
 
 {selectedVolunteer && (

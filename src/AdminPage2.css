@@ -5,9 +5,9 @@
 @font-face {
     font-family: 'OS Aran W FFC 500';
     src: url('./OS Aran W FFC 500.ttf') format('truetype');
-  }
+}
 
-  html, body {
+html, body {
     height: 100%;
     margin: 0;
     display: flex;
@@ -28,16 +28,15 @@
     margin: 0 auto; /* Center the div horizontally */
     display: flex; /* Ensure the div is a block-level element */
     justify-content: space-between; /* Ensure space between items */
-    box-shadow: 0 4px 2px -2px rgb(198, 198, 198); /* הצללה למטה */
-    overflow: visible; /* מאפשר ללוגו לחרוג מהגבולות */
+    box-shadow: 0 4px 2px -2px rgb(198, 198, 198); /* Add shadow at the bottom */
+    overflow: visible; /* Allow logo to overflow the boundaries */
 }
 
 .header-title {
-    font-size: 25px; /* שינוי גודל הכותרת */
-    margin-left: 66%; /* להזיז את הכותרת ימינה */
+    font-size: 25px; /* Change title size */
+    margin-left: 66%; /* Move the title to the right */
     font-size: larger; 
 }
-
 
 .header img.logo {
     position: absolute;
@@ -45,14 +44,14 @@
     top: 50%;
     transform: translateY(-50%);
     height: 110px;
-    cursor: pointer; /* שינוי הסמן כאשר עוברים מעל הלוגו */
-    transition: transform 0.3s ease; /* אנימציה לשינוי הגודל */
-    border-radius: 50%; /* עיגול */
+    cursor: pointer; /* Change cursor on hover over logo */
+    transition: transform 0.3s ease; /* Add animation for size change */
+    border-radius: 50%; /* Make round */
     margin-right: 1%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* הצללה */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow */
     margin-top: 20px;
-    z-index: 10; /* הופך את הלוגו לעליון על שאר האלמנטים */
-  }
+    z-index: 10; /* Make the logo appear on top of other elements */
+}
 
 /* Create two unequal columns that float next to each other */
 .row {
@@ -104,7 +103,6 @@ ul.menu {
     padding: 0;
     margin-top: 10%;
     flex: 1 0 auto; /* Menu takes remaining height */
-
 }
 
 ul.menu li {
@@ -114,15 +112,15 @@ ul.menu li {
     text-align: right;
     cursor: pointer;
     flex: 0 0 auto; /* Fixed height for menu items */
-    transition: font-size 0.3s, opacity 0.5s; /* הוספת טרנזישן לשינוי גודל הכתב */
+    transition: font-size 0.3s, opacity 0.5s; /* Add transition for font size change */
     opacity: 0; /* Initially hidden */
     animation: fadeIn 0.5s forwards; /* Add fadeIn animation */
     margin-right: 15px;
 }
 
 ul.menu li:hover {
-    background-color: transparent; /* ביטול צבע הרקע ב-HOVER */
-    font-size: 1.2em; /* הגדלת הכתב ב-HOVER */
+    background-color: transparent; /* Remove background color on hover */
+    font-size: 1.2em; /* Increase font size on hover */
 }
 
 /* Keyframes for fadeIn animation */
@@ -168,11 +166,11 @@ tbody tr {
 }
 
 tbody tr:nth-child(odd) {
-    background-color: #F8F8F8; /* רקע לשורות במיקום אי זוגי */
+    background-color: #F8F8F8; /* Background for odd rows */
 }
 
 tbody tr:nth-child(even) {
-    background-color: #ffffff; /* רקע לשורות במיקום זוגי */
+    background-color: #ffffff; /* Background for even rows */
 }
 
 /* Keyframes for slideIn animation */
@@ -190,7 +188,7 @@ tbody tr:nth-child(even) {
     padding: 8px 12px;
     cursor: pointer;
     font-size: 16px;
-    margin-right: 5px; /* מרווח בין הכפתורים */
+    margin-right: 5px; /* Spacing between buttons */
     transition: background-color 0.3s, opacity 0.5s; /* Add transition for background color and opacity */
     opacity: 0; /* Initially hidden */
     animation: fadeIn 0.5s forwards; /* Add fadeIn animation */
@@ -198,12 +196,12 @@ tbody tr:nth-child(even) {
 }
 
 .action-button:last-of-type {
-    margin-right: 0; /* הסרת מרווח מהכפתור האחרון */
+    margin-right: 0; /* Remove spacing from the last button */
 }
 
 .action-button:hover {
     background-color: #475191;
-    transform: scale(1.1); /* הגדלת הכפתור ב-10% */
+    transform: scale(1.1); /* Increase button size by 10% */
 }
 
 .message {
@@ -231,7 +229,7 @@ input[type="radio"] {
 }
 
 .modal {
-    display: none; /* מוסתר כברירת מחדל */
+    display: none; /* Hidden by default */
     position: fixed;
     z-index: 1;
     left: 0;
@@ -239,7 +237,7 @@ input[type="radio"] {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4); /* צבע רקע שקוף */
+    background-color: rgba(0, 0, 0, 0.4); /* Transparent background color */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -250,12 +248,12 @@ input[type="radio"] {
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 60%; /* רוחב בינוני */
-    max-width: 600px; /* הגבלת רוחב מקסימלי */
-    height: 70%; /* גובה בינוני */
-    max-height: 500px; /* הגבלת גובה מקסימלי */
-    border-radius: 10px; /* פינות מעוגלות */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* הצללה */
+    width: 60%; /* Medium width */
+    max-width: 600px; /* Limit max width */
+    height: 70%; /* Medium height */
+    max-height: 500px; /* Limit max height */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Add shadow */
     display: flex;
     flex-direction: column;
 }
@@ -274,8 +272,8 @@ input[type="radio"] {
 }
   
 .modal-body {
-    flex: 1; /* מאפשר לגוף המודאל לקחת את המקום הנותר */
-    overflow-y: auto; /* גלילה אנכית אם התוכן חורג מהגובה */
+    flex: 1; /* Allow modal body to take remaining space */
+    overflow-y: auto; /* Vertical scrolling if content overflows */
 }
   
 .close-button {
@@ -291,11 +289,11 @@ input[type="radio"] {
   
 .close-button:hover {
     background-color: #3a437a;
-    transform: scale(1.1); /* הגדלת הכפתור ב-10% */
+    transform: scale(1.1); /* Increase button size by 10% */
 }
   
 .form-group {
-    margin-bottom: 15px; /* מגדיר מרווח של 15 פיקסלים בין השורות */
+    margin-bottom: 15px; /* Define 15px margin between rows */
 }
 
 .footer {
@@ -307,18 +305,17 @@ input[type="radio"] {
     width: 100%;
     font-size: larger;
 }
-
   
-  .footer a {
-    color: white; /* צבע הכחול של הלינק */
-    text-decoration: none; /* ללא קו תחתון */
-  }
+.footer a {
+    color: white; /* Link color */
+    text-decoration: none; /* No underline */
+}
   
-  .footer a:hover {
-    text-decoration: underline; /* הוספת קו תחתון בהובר */
-  }
+.footer a:hover {
+    text-decoration: underline; /* Add underline on hover */
+}
 
-  .container {
+.container {
     flex: 1; /* Grow to take the remaining space */
 }
 
@@ -328,13 +325,12 @@ input[type="radio"] {
     min-height: 100vh; /* Full height of the viewport */
 }
 
+.large-margin-bottom {
+    margin-bottom: 2%; /* Larger margin below the title */
+    margin-top: 2%; /* Larger margin below the title */
+}
 
-  .large-margin-bottom {
-    margin-bottom: 2%; /* מרווח גדול יותר מתחת לכותרת */
-    margin-top: 2%; /* מרווח גדול יותר מתחת לכותרת */
-  }
-
-  .search-container {
+.search-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -353,17 +349,17 @@ input[type="radio"] {
     border: 1px solid #ccc;
     border-radius: 4px;
     text-align: right;
-    height: 40px; /* הגדרת גובה זהה עבור combobox ו-textbox */
+    height: 40px; /* Set same height for combobox and textbox */
 }
 
 .search-select {
-    margin-left: 15px; /* מרווח בין ה-combobox לחיפוש */
+    margin-left: 15px; /* Margin between combobox and search */
     font-size: 18px;
     margin-top: 5px;
 }
 
 .search-input {
-    width: 300px; /* הגדרת רוחב */
+    width: 300px; /* Set width */
 }
 
 .export-button {

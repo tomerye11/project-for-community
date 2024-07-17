@@ -21,6 +21,7 @@ const Registration = () => {
 	const [isSubmitDisabled, setIsSubmitDisabled] = useState(false); // Added state variable
 
 	useEffect(() => {
+		// Fetch volunteer areas from Firestore when the component mounts
 		const fetchVolunteerAreas = async () => {
 			const querySnapshot = await getDocs(collection(db, 'Volunteer Areas'));
 			const areas = querySnapshot.docs.map(doc => ({
@@ -33,32 +34,34 @@ const Registration = () => {
 		fetchVolunteerAreas();
 	}, []);
 
+	// Validation functions
 	const isValidName = (name: string) => {
-		const regex = /^[a-zA-Z\u0590-\u05FF\s]+$/; // תומך באותיות עבריות, אנגליות ורווחים בלבד
+		const regex = /^[a-zA-Z\u0590-\u05FF\s]+$/; // Supports Hebrew, English letters and spaces only
 		return regex.test(name);
 	};
 
 	const isValidId = (id: string) => {
-		const regex = /^[0-9]{9}$/; // בדיקה שתעודת הזהות כוללת 9 ספרות בלבד
+		const regex = /^[0-9]{9}$/; // Checks if ID contains exactly 9 digits
 		return regex.test(id);
 	};
 
 	const isValidPhone = (phone: string) => {
-		const regex = /^05\d{8}$/; // בדיקה שמספר הפלאפון מתחיל ב-05, כולל 10 ספרות ומספרים בלבד
+		const regex = /^05\d{8}$/; // Checks if phone number starts with 05 and has 10 digits
 		return regex.test(phone);
 	};
 
 	const isValidEmail = (email: string) => {
-		const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // בדיקה לכתובת מייל תקנית עם תווים אנגליים בלבד
+		const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Validates email address with English characters only
 		return regex.test(email);
 	};
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 		const { name, value, type, checked, files } = e.target;
 
+		// Perform validations based on input name
 		if (name === 'firstName' || name === 'lastName') {
 			if (!isValidName(value)) {
-				setError('.שם פרטי ושם משפחה לא תקינים');
+				setError('Invalid first or last name.');
 			} else {
 				setError('');
 			}
@@ -66,7 +69,7 @@ const Registration = () => {
 
 		if (name === 'id') {
 			if (!isValidId(value)) {
-				setError('.מספר תעודת זהות לא תקין');
+				setError('Invalid ID number.');
 			} else {
 				setError('');
 			}
@@ -74,7 +77,7 @@ const Registration = () => {
 
 		if (name === 'phone') {
 			if (!isValidPhone(value)) {
-				setError('.מספר טלפון לא תקין');
+				setError('Invalid phone number.');
 			} else {
 				setError('');
 			}
@@ -82,7 +85,7 @@ const Registration = () => {
 
 		if (name === 'email') {
 			if (!isValidEmail(value)) {
-				setError('.כתובת מייל לא תקינה');
+				setError('Invalid email address.');
 			} else {
 				setError('');
 			}
@@ -91,7 +94,7 @@ const Registration = () => {
 		if (type === 'file') {
 			const file = files ? files[0] : null;
 			if (file && name === 'policeApproval' && file.type !== 'application/pdf') {
-				setError('PDF אנא העלה קובץ רק מסוג');
+				setError('Please upload a PDF file only.');
 				setFormData({
 					...formData,
 					[name]: null,
@@ -112,6 +115,7 @@ const Registration = () => {
 			});
 		}
 
+		// Check if the selected volunteer area involves working with kids
 		if (name === 'volunteerArea') {
 			const selectedArea = volunteerAreas.find(area => area.id === value);
 			setWithKids(selectedArea ? selectedArea.withKids : false);
@@ -121,33 +125,34 @@ const Registration = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
+		// Validate form data before submission
 		if (!isValidName(formData.firstName)) {
-			setError('.שם פרטי לא תקין');
+			setError('Invalid first name.');
 			return;
 		}
 
 		if (!isValidName(formData.lastName)) {
-			setError('.שם משפחה לא תקין');
+			setError('Invalid last name.');
 			return;
 		}
 
 		if (!isValidId(formData.id)) {
-			setError('.מספר תעודת זהות לא תקין');
+			setError('Invalid ID number.');
 			return;
 		}
 
 		if (!isValidPhone(formData.phone)) {
-			setError('.מספר טלפון לא תקין');
+			setError('Invalid phone number.');
 			return;
 		}
 
 		if (!isValidEmail(formData.email)) {
-			setError('.כתובת מייל לא תקינה');
+			setError('Invalid email address.');
 			return;
 		}
 
 		if (withKids && formData.gender === 'Male' && (!formData.policeApproval || formData.policeApproval.type !== 'application/pdf')) {
-			setError('אנא העלה קובץ מסוג PDF בלבד.');
+			setError('Please upload a PDF file only.');
 			return;
 		}
 
@@ -195,7 +200,7 @@ const Registration = () => {
 					policeForm: policeFormURL || existingVolunteerData.policeForm,
 				});
 				console.log('Volunteer details updated successfully!'); // Debugging line
-				alert('Volunteer details updated successfully!');
+				alert('!פרטי המתנדב עודכנו בהצלחה');
 			} catch (error) {
 				console.error('Error updating document: ', error);
 				setError(`Failed to update volunteer details. Error: ${error.message}`);
@@ -217,7 +222,7 @@ const Registration = () => {
 					policeForm: policeFormURL,
 				});
 				
-				alert('טופס נשלח בהצלחה');
+				alert('!טופס נשלח בהצלחה');
 			} catch (error) {
 				console.error('Error adding document: ', error);
 				setError(`Failed to add volunteer. Error: ${error.message}`);
@@ -323,7 +328,7 @@ const Registration = () => {
 							</div>
 						</div>
 					)}
-					<button type="submit" disabled={isSubmitDisabled}>שלח טופס</button> {/* הוספת ניטרול כפתור השליחה */}
+					<button type="submit" disabled={isSubmitDisabled}>שלח טופס</button> {/* Disable submit button if necessary */}
 				</form>
 			</div>
 		</div>
