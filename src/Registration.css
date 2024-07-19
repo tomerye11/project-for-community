@@ -8,7 +8,6 @@
     text-align: center; /* Center the text */
     background: white; /* Set the background color to white */
     padding: 5%; /* Add padding inside the form */
-    /* border-radius: 15px; Remove rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
     border-radius:10px; /* Add rounded corners with 10px radius */
 }
@@ -88,7 +87,6 @@
     color: #fff; /* Set the text color to white */
     border: 0; /* Remove the border */
     padding: 8px; /* Add padding inside the button */
-    /* border-radius: 8px; Remove rounded corners */
     cursor: pointer; /* Change cursor to pointer on hover */
     width: 30%; /* Set the width to 30% of the parent element */
     transition: transform 0.3s ease; /* Smooth transition for transform property */

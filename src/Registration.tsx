@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db, storage } from './firebase'; // Ensure the correct path to your firebase config
+import { db, storage } from './firebase';
 import { collection, getDocs, query, addDoc, updateDoc, doc, getDoc, Timestamp, arrayUnion, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import './Registration.css';
@@ -18,8 +18,13 @@ const Registration = () => {
 	});
 	const [error, setError] = useState('');
 	const [withKids, setWithKids] = useState(false);
-	const [isSubmitDisabled, setIsSubmitDisabled] = useState(false); // Added state variable
+	const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
+	/**
+	 * useEffect hook to fetch volunteer areas from Firestore when the component mounts.
+	 * - Retrieves documents from the 'Volunteer Areas' collection.
+	 * - Maps the document data to an array of areas and updates the 'volunteerAreas' state.
+	*/
 	useEffect(() => {
 		// Fetch volunteer areas from Firestore when the component mounts
 		const fetchVolunteerAreas = async () => {
@@ -55,6 +60,12 @@ const Registration = () => {
 		return regex.test(email);
 	};
 
+	/**
+ 	 * Handles input changes and updates form data state.
+ 	 * - Validates name, ID, phone, and email fields.
+ 	 * - Handles file uploads, accepting only PDFs for police approval.
+ 	 * - Updates form data and volunteer area state.
+ 	*/
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 		const { name, value, type, checked, files } = e.target;
 
@@ -122,6 +133,15 @@ const Registration = () => {
 		}
 	};
 
+	/**
+	 * Handles form submission, including validation, uploading police approval, 
+	 * and adding/updating volunteer documents in Firestore.
+	 * - Validates form fields before submission.
+	 * - Uploads police approval file to Firebase Storage and gets its URL.
+	 * - Adds or updates volunteer document in Firestore based on ID existence.
+	 * - Handles police approval URL in 'Police Forms' collection.
+	 * - Clears the form fields after successful submission.
+	*/
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
