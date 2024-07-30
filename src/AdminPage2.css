@@ -1,0 +1,387 @@
+* {
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: 'OS Aran W FFC 500';
+    src: url('./OS Aran W FFC 500.ttf') format('truetype');
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Style the header */
+.header {
+    font-family: 'OS Aran W FFC 500', sans-serif;
+    background-color: white; /* Change background color to white */
+    font-size: 25px;
+    position: relative;
+    padding: 30px 30px; /* Increase padding for height */
+    flex: 0 0 auto; /* Header height fixed */
+    width: 100%;
+    height: 20%;
+    margin: 0 auto; /* Center the div horizontally */
+    display: flex; /* Ensure the div is a block-level element */
+    justify-content: space-between; /* Ensure space between items */
+    box-shadow: 0 4px 2px -2px rgb(198, 198, 198); /* Add shadow at the bottom */
+    overflow: visible; /* Allow logo to overflow the boundaries */
+}
+
+.header-title {
+    font-size: 25px; /* Change title size */
+    margin-left: 50%; /* Move the title to the right */
+    font-size: larger; 
+}
+
+.header img.logo {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 110px;
+    cursor: pointer; /* Change cursor on hover over logo */
+    transition: transform 0.3s ease; /* Add animation for size change */
+    border-radius: 50%; /* Make round */
+    margin-right: 1%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow */
+    margin-top: 20px;
+    z-index: 10; /* Make the logo appear on top of other elements */
+}
+
+/* Create two unequal columns that float next to each other */
+.row {
+    font-family: 'OS Aran W FFC 500', sans-serif;
+    display: flex;
+    flex: 1 0 auto; /* Row takes remaining height */
+}
+
+/* Right column */
+.column.side {
+    font-family: 'OS Aran W FFC 500', sans-serif;
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    font-size: larger; 
+}
+
+/* Middle column */
+.column.middle {
+    font-family: 'OS Aran W FFC 500', sans-serif;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center vertically */
+    text-align: right;
+    align-items: center;
+    font-size: larger; 
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+@media (max-width: 600px) {
+    .column.side, .column.middle {
+        width: 100%;
+    }
+}
+
+ul.menu {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10%;
+    flex: 1 0 auto; /* Menu takes remaining height */
+}
+
+ul.menu li {
+    margin: 5px 0;
+    padding: 10px;
+    text-align: right;
+    cursor: pointer;
+    flex: 0 0 auto; /* Fixed height for menu items */
+    transition: font-size 0.3s, opacity 0.5s; /* Add transition for font size change */
+    opacity: 0; /* Initially hidden */
+    animation: fadeIn 0.5s forwards; /* Add fadeIn animation */
+    margin-right: 15px;
+}
+
+ul.menu li:hover {
+    background-color: transparent; /* Remove background color on hover */
+    font-size: 1.2em; /* Increase font size on hover */
+}
+
+/* Keyframes for fadeIn animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+table {
+    width: 100%; /* Adjust the width to fit the content */
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: right;
+    /* Add slideIn animation */
+    opacity: 0;
+    transform: translateX(-100%);
+    animation: slideIn 0.5s forwards;
+    font-size: large;
+}
+
+thead tr {
+    background-color: #00237a;
+    color: #ffffff;
+    text-align: right;
+    font-weight: bold;
+}
+
+th, td {
+    padding: 12px 15px;
+}
+
+tbody tr {
+    border: 1px solid #F8F8F8;
+    opacity: 0;
+    transform: translateX(-100%);
+    animation: slideIn 0.5s forwards;
+    animation-delay: calc(0.1s * var(--i)); /* Add delay for each row */
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #F8F8F8; /* Background for odd rows */
+}
+
+tbody tr:nth-child(even) {
+    background-color: #ffffff; /* Background for even rows */
+}
+
+/* Keyframes for slideIn animation */
+@keyframes slideIn {
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.action-button {
+    background-color: #00237a;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 5px; /* Spacing between buttons */
+    transition: background-color 0.3s, opacity 0.5s; /* Add transition for background color and opacity */
+    opacity: 0; /* Initially hidden */
+    animation: fadeIn 0.5s forwards; /* Add fadeIn animation */
+    margin-bottom: 3.4px;
+}
+
+.action-button:last-of-type {
+    margin-right: 0; /* Remove spacing from the last button */
+}
+
+.action-button:hover {
+    background-color: #475191;
+    transform: scale(1.1); /* Increase button size by 10% */
+}
+
+.message {
+    background-color: #c4cadf;
+    color: white;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #d6e9c6;
+    border-radius: 4px;
+    text-align: center;
+}
+
+input[type="text"] {
+    width: calc(100% - 10px);
+    padding: 5px;
+    margin-top: 5px;
+}
+
+.align-right {
+    text-align: right;
+}
+
+input[type="radio"] {
+    margin-left: 10px;
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* Transparent background color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+  
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 60%; /* Medium width */
+    max-width: 600px; /* Limit max width */
+    height: 70%; /* Medium height */
+    max-height: 500px; /* Limit max height */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Add shadow */
+    display: flex;
+    flex-direction: column;
+}
+  
+.modal-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+  
+.modal-header h4 {
+    margin: 0;
+}
+  
+.modal-body {
+    flex: 1; /* Allow modal body to take remaining space */
+    overflow-y: auto; /* Vertical scrolling if content overflows */
+}
+  
+.close-button {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    background-color: #475191;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: flex-end;
+}
+  
+.close-button:hover {
+    background-color: #3a437a;
+    transform: scale(1.1); /* Increase button size by 10% */
+}
+  
+.form-group {
+    margin-bottom: 15px; /* Define 15px margin between rows */
+}
+
+.footer {
+    font-family: 'OS Aran W FFC 500', sans-serif;
+    flex-shrink: 0; /* Ensure the footer does not shrink */
+    background-color: #00237a; 
+    text-align: center;
+    padding: 20px 0; 
+    width: 100%;
+    font-size: larger;
+}
+  
+.footer a {
+    color: white; /* Link color */
+    text-decoration: none; /* No underline */
+}
+  
+.footer a:hover {
+    text-decoration: underline; /* Add underline on hover */
+}
+
+.container {
+    flex: 1; /* Grow to take the remaining space */
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Full height of the viewport */
+}
+
+.large-margin-bottom {
+    margin-bottom: 2%; /* Larger margin below the title */
+    margin-top: 2%; /* Larger margin below the title */
+}
+
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+}
+
+.search-select,
+.search-input {
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: right;
+    height: 40px; /* Set same height for combobox and textbox */
+}
+
+.search-select {
+    margin-left: 15px; /* Margin between combobox and search */
+    font-size: 18px;
+    margin-top: 5px;
+}
+
+.search-input {
+    width: 300px; /* Set width */
+}
+
+.export-button {
+    background-color: #00237a;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.export-button:hover {
+    background-color: #475191;
+}
+
+.search-input2 {
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: right;
+    height: 40px;
+}
+
+.search-container2 {
+    display: flex;
+    justify-content: space-between;
+    width: 25%;
+    margin-left: auto;
+}

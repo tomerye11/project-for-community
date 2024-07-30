@@ -1,0 +1,19 @@
+{
+  "projects": {
+    "default": "community-registration-db"
+  },
+  "targets": {
+    "community-registration-db": {
+      "hosting": {
+        "registrationsite": [
+          "registrationsite"
+        ],
+        "adminminhal": [
+          "adminminhal"
+        ]
+      }
+    }
+  },
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}

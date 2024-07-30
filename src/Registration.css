@@ -1,0 +1,135 @@
+/* Registration.css */
+
+/* create new blog form */
+.create {
+    width: 90%; /* Set the width to 90% of the parent element */
+    max-width: 600px; /* Set the maximum width to 600px */
+    margin: 0 auto; /* Center the form horizontally */
+    text-align: center; /* Center the text */
+    background: white; /* Set the background color to white */
+    padding: 5%; /* Add padding inside the form */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+    border-radius:10px; /* Add rounded corners with 10px radius */
+}
+
+.create-container {
+    background: linear-gradient(to bottom right, #ccc, white); /* Set a gradient background */
+    padding: 2%; /* Add padding inside the container */
+    display: flex; /* Use Flexbox for layout */
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    min-height: 100vh; /* Ensure the container is at least the full viewport height */
+}
+
+.form-row {
+    display: flex; /* Use Flexbox for layout */
+    justify-content: space-between; /* Space out the child elements */
+    margin-bottom: 10px; /* Add margin below each row */
+    flex-wrap: wrap; /* Allow wrapping of child elements */
+}
+
+.form-row > div {
+    flex: 0 0 48%; /* Set the width of each child to 48% */
+    margin-bottom: 10px; /* Add margin below each child element */
+}
+
+.form-row.full-width > div {
+    flex: 0 0 100%; /* Set the width of each child to 100% */
+}
+
+.form-row.gender-row > div {
+    display: flex; /* Use Flexbox for layout */
+    flex-direction: column; /* Stack child elements vertically */
+}
+
+.create label {
+    text-align: right; /* Align text to the right */
+    display: block; /* Display as block element */
+    margin-bottom: 5px; /* Add margin below each label */
+}
+
+.create h2 {
+    font-size: 20px; /* Set font size to 20px */
+    color: #00237a; /* Set text color */
+    margin-bottom: 30px; /* Add margin below the heading */
+    position: relative; /* Position relatively for logo placement */
+}
+
+.create h2::before {
+    content: ''; /* Add empty content for the logo */
+    background-image: url('registration/build/logo2.jpg'); /* Set the background image */
+    background-size: contain; /* Contain the image within the element */
+    background-repeat: no-repeat; /* Prevent image repetition */
+    position: absolute; /* Position absolutely within the heading */
+    left: -50px; /* Position the logo to the left of the heading */
+    top: 50%; /* Center vertically within the heading */
+    transform: translateY(-50%); /* Adjust vertical position */
+    height: 150px; /* Set the height of the logo */
+    width: 150px; /* Set the width of the logo */
+}
+
+.create input, .create textarea, .create select {
+    width: 100%; /* Set the width to 100% of the parent element */
+    padding: 6px 10px; /* Add padding inside the input elements */
+    margin: 5px 0; /* Add margin above and below the input elements */
+    border: 1px solid #ddd; /* Add a light gray border */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    display: block; /* Display as block element */
+}
+
+.create input[type="radio"] {
+    width: auto; /* Set the width to auto */
+    margin: 0 5px 0 0; /* Add margin to the right */
+}
+
+.create button {
+    background: #00237a; /* Set the background color */
+    color: #fff; /* Set the text color to white */
+    border: 0; /* Remove the border */
+    padding: 8px; /* Add padding inside the button */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    width: 30%; /* Set the width to 30% of the parent element */
+    transition: transform 0.3s ease; /* Smooth transition for transform property */
+}
+
+.create button:hover {
+    background-color: #475191; /* Change background color on hover */
+    transform: scale(1.05); /* Scale the button up by 5% on hover */
+}
+
+.radio-group {
+    display: flex; /* Use Flexbox for layout */
+    justify-content: flex-end; /* Align items to the end */
+    align-items: center; /* Center items vertically */
+}
+
+.radio-group label {
+    display: flex; /* Use Flexbox for layout */
+    align-items: center; /* Center items vertically */
+    gap: 5px; /* Add gap between elements */
+    flex-direction: row-reverse; /* Reverse the direction of items */
+}
+
+.form-row.center {
+    justify-content: center; /* Center child elements horizontally */
+}
+
+.form-row.center > div {
+    flex: 0 0 100%; /* Set the width of each child to 100% */
+}
+
+@media (max-width: 768px) {
+    .form-row > div {
+        flex: 0 0 100%; /* Set the width of each child to 100% on small screens */
+    }
+}
+
+.main-title {
+    font-size: 24px; /* Set font size to 24px */
+    color: #00237a; /* Set text color */
+}
+
+.sub-title {
+    font-size: 18px; /* Update text size */
+    color: black; /* Set text color */
+}
