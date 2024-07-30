@@ -8,6 +8,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import * as XLSX from 'xlsx';
 
+
 ChartJS.register(ArcElement, BarElement, Tooltip, Legend, CategoryScale, LinearScale, ChartDataLabels);
 
 const AdminPage2: React.FC = () => {
@@ -16,7 +17,11 @@ const AdminPage2: React.FC = () => {
     const [editAreaId, setEditAreaId] = useState<string | null>(null);
     const [updatedArea, setUpdatedArea] = useState<any>({});
     const [message, setMessage] = useState<string | null>(null);
-    const [newArea, setNewArea] = useState({ id: '', withKids: '', whatsAppLink: '' });
+    const [newArea, setNewArea] = useState<{ id: string, withKids: boolean, whatsAppLink: string }>({
+        id: '',
+        withKids: false,
+        whatsAppLink: ''
+      });
     const [volunteerStats, setVolunteerStats] = useState<{ [key: string]: number }>({});
     const [totalVolunteers, setTotalVolunteers] = useState<number>(0);
     const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
@@ -75,7 +80,7 @@ const AdminPage2: React.FC = () => {
 
                 if (selectedMenu === 'statistics') {
                     const stats = volunteers.filter(volunteer => volunteer.confirmed).reduce((acc, volunteer) => {
-                        volunteer.volunteerArea?.forEach(area => {
+                        volunteer.volunteerArea?.forEach((area: string | number) => {
                             acc[area] = (acc[area] || 0) + 1;
                         });
                         return acc;
@@ -140,7 +145,7 @@ const AdminPage2: React.FC = () => {
             const confirmedQuery = query(volunteersRef, where('confirmed', '==', true));
             const querySnapshot = await getDocs(confirmedQuery);
 
-            let allVolunteers = [];
+            let allVolunteers: React.SetStateAction<any[]> = [];
             querySnapshot.forEach(doc => {
                 allVolunteers.push({ id: doc.id, ...doc.data() });
             });
@@ -253,7 +258,7 @@ const AdminPage2: React.FC = () => {
     */
     const handleSearchArea = async () => {
         const volunteerAreasRef = collection(db, 'Volunteer Areas');
-        let searchResults = [];
+        let searchResults: React.SetStateAction<any[]> = [];
 
         if (searchTerm === '') {
             setSearchResults(volunteerAreas);
@@ -275,7 +280,7 @@ const AdminPage2: React.FC = () => {
      * - If found, deletes the document and refreshes the volunteer list.
      * - Logs an error message if the volunteer is not found or if the delete operation fails.
     */
-    const handleDeleteVolunteer = async (volunteerId) => {
+    const handleDeleteVolunteer = async (volunteerId: unknown) => {
         try {
             const volunteersRef = collection(db, 'Volunteers');
 
@@ -406,7 +411,7 @@ const AdminPage2: React.FC = () => {
             volunteersSnapshot.forEach((doc) => {
                 const volunteer = doc.data();
                 if (volunteer.volunteerArea && volunteer.volunteerArea.includes(editAreaId)) {
-                    const updatedVolunteerAreas = volunteer.volunteerArea.map(area =>
+                    const updatedVolunteerAreas = volunteer.volunteerArea.map((area: string) =>
                         area === editAreaId ? updatedArea.id : area
                     );
                     batch.update(doc.ref, { volunteerArea: updatedVolunteerAreas });
@@ -438,13 +443,13 @@ const AdminPage2: React.FC = () => {
         setEditAreaId(null);
     };
 
-    const handleNewAreaInputChange = (e) => {
+    const handleNewAreaInputChange = (e: { target: { name: any; value: any; }; }) => {
         const { name, value } = e.target;
         setNewArea({ ...newArea, [name]: value });
     };
 
-    const handleNewAreaRadioChange = (e) => {
-        setNewArea({ ...newArea, withKids: e.target.value === 'true' });
+    const handleNewAreaRadioChange = (e: { target: { value: string; }; }) => {
+        setNewArea({ ...newArea, withKids: e.target.value === "true" });
     };
 
     /**
@@ -468,7 +473,7 @@ const AdminPage2: React.FC = () => {
             setTimeout(() => {
                 setMessage(null);
             }, 2500);
-            setNewArea({ id: '', withKids: '', whatsAppLink: '' }); // Reset form
+            setNewArea({ id: '', withKids: false, whatsAppLink: '' }); // Reset form
         } catch (error) {
             console.error('Error adding document: ', error);
             setMessage('שגיאה בהוספת תחום התנדבות.');
@@ -531,7 +536,7 @@ const AdminPage2: React.FC = () => {
                 if (response.ok) {
                     console.log("PDF generated successfully.");
                     const pdfBlob = await response.blob();
-                    const pdfURL = URL.createObjectURL(pdfBlob);
+                    // const pdfURL = URL.createObjectURL(pdfBlob);
                     const pdfPath = `C:/BituahLeumiForms/${arr[2]}.pdf`;
 
                     setVolunteers(prevVolunteers => prevVolunteers.map(volunteer =>
@@ -596,7 +601,7 @@ const AdminPage2: React.FC = () => {
      * - Deletes the volunteer document from Firestore.
      * - Updates the volunteer list and displays a success or error message.
     */
-    const handleReject = async (volunteerId) => {
+    const handleReject = async (volunteerId: any) => {
         try {
             const querySnapshot = await getDocs(collection(db, "Volunteers"));
             const volunteerDoc = querySnapshot.docs.find(doc => doc.data().id === volunteerId);

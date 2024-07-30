@@ -1,5 +1,5 @@
-
 import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth'; // ייבוא Firebase Authentication
 import { getFirestore } from 'firebase/firestore';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
@@ -15,6 +15,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app); // אתחול Firebase Authentication
 const db = getFirestore(app);
 const storage = getStorage(app);
 
@@ -46,4 +47,4 @@ const uploadFileAndGetURL = (file: File) => {
   });
 };
 
-export { db, storage, uploadFileAndGetURL };
+export { auth, db, storage, uploadFileAndGetURL }; // הוספת auth לייצוא

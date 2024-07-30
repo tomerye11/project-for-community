@@ -66,72 +66,79 @@ const Registration = () => {
  	 * - Handles file uploads, accepting only PDFs for police approval.
  	 * - Updates form data and volunteer area state.
  	*/
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-		const { name, value, type, checked, files } = e.target;
-
+	 const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+		const { name, value, type } = e.target;
+	  
 		// Perform validations based on input name
 		if (name === 'firstName' || name === 'lastName') {
-			if (!isValidName(value)) {
-				setError('Invalid first or last name.');
-			} else {
-				setError('');
-			}
+		  if (!isValidName(value)) {
+			setError('שם פרטי או משפחה לא תקין');
+		  } else {
+			setError('');
+		  }
 		}
-
+	  
 		if (name === 'id') {
-			if (!isValidId(value)) {
-				setError('Invalid ID number.');
-			} else {
-				setError('');
-			}
+		  if (!isValidId(value)) {
+			setError('מספר תעודת זהות לא תקין');
+		  } else {
+			setError('');
+		  }
 		}
-
+	  
 		if (name === 'phone') {
-			if (!isValidPhone(value)) {
-				setError('Invalid phone number.');
-			} else {
-				setError('');
-			}
+		  if (!isValidPhone(value)) {
+			setError('מספר טלפון לא תקין');
+		  } else {
+			setError('');
+		  }
 		}
-
+	  
 		if (name === 'email') {
-			if (!isValidEmail(value)) {
-				setError('Invalid email address.');
-			} else {
-				setError('');
-			}
+		  if (!isValidEmail(value)) {
+			setError('כתובת מייל לא תקינה');
+		  } else {
+			setError('');
+		  }
 		}
-
+	  
 		if (type === 'file') {
-			const file = files ? files[0] : null;
-			if (file && name === 'policeApproval' && file.type !== 'application/pdf') {
-				setError('Please upload a PDF file only.');
-				setFormData({
-					...formData,
-					[name]: null,
-				});
-				setIsSubmitDisabled(true); // Disable submit button
-			} else {
-				setError('');
-				setFormData({
-					...formData,
-					[name]: file,
-				});
-				setIsSubmitDisabled(false); // Enable submit button
-			}
-		} else {
+		  const target = e.target as HTMLInputElement;
+		  const file = target.files ? target.files[0] : null;
+		  if (file && name === 'policeApproval' && file.type !== 'application/pdf') {
+			setError('PDF העלה קובץ רק מסוג');
 			setFormData({
-				...formData,
-				[name]: type === 'checkbox' ? checked : value,
+			  ...formData,
+			  [name]: null,
 			});
+			setIsSubmitDisabled(true); // Disable submit button
+		  } else {
+			setError('');
+			setFormData({
+			  ...formData,
+			  [name]: file,
+			});
+			setIsSubmitDisabled(false); // Enable submit button
+		  }
+		} else if (type === 'checkbox') {
+		  const target = e.target as HTMLInputElement;
+		  setFormData({
+			...formData,
+			[name]: target.checked,
+		  });
+		} else {
+		  setFormData({
+			...formData,
+			[name]: value,
+		  });
 		}
-
+	  
 		// Check if the selected volunteer area involves working with kids
 		if (name === 'volunteerArea') {
-			const selectedArea = volunteerAreas.find(area => area.id === value);
-			setWithKids(selectedArea ? selectedArea.withKids : false);
+		  const selectedArea = volunteerAreas.find(area => area.id === value);
+		  setWithKids(selectedArea ? selectedArea.withKids : false);
 		}
-	};
+	  };
 
 	/**
 	 * Handles form submission, including validation, uploading police approval, 
@@ -147,32 +154,32 @@ const Registration = () => {
 
 		// Validate form data before submission
 		if (!isValidName(formData.firstName)) {
-			setError('Invalid first name.');
+			setError('שם פרטי לא תקין');
 			return;
 		}
 
 		if (!isValidName(formData.lastName)) {
-			setError('Invalid last name.');
+			setError('שם משפחה לא תקין');
 			return;
 		}
 
 		if (!isValidId(formData.id)) {
-			setError('Invalid ID number.');
+			setError('מספר תעודת זהות לא תקין');
 			return;
 		}
 
 		if (!isValidPhone(formData.phone)) {
-			setError('Invalid phone number.');
+			setError('מספר טלפון לא תקין');
 			return;
 		}
 
 		if (!isValidEmail(formData.email)) {
-			setError('Invalid email address.');
+			setError('כתובת מייל לא תקינה');
 			return;
 		}
 
 		if (withKids && formData.gender === 'Male' && (!formData.policeApproval || formData.policeApproval.type !== 'application/pdf')) {
-			setError('Please upload a PDF file only.');
+			setError('סוג קובץ לא תקין');
 			return;
 		}
 
@@ -180,18 +187,22 @@ const Registration = () => {
 		console.log('Form submitted:', formData); // Debugging line
 
 		let policeFormURL = null;
-		if (formData.policeApproval) {
-			const policeFormRef = ref(storage, `policeForms/${formData.id}/${formData.policeApproval.name}`);
-			try {
-				await uploadBytes(policeFormRef, formData.policeApproval);
-				policeFormURL = await getDownloadURL(policeFormRef);
-				console.log('Police form uploaded:', policeFormURL); // Debugging line
-			} catch (error) {
-				console.error('Error uploading police approval: ', error);
-				setError(`Failed to upload police approval. Error: ${error.message}`);
-				return;
-			}
-		}
+if (formData.policeApproval) {
+  const policeFormRef = ref(storage, `policeForms/${formData.id}/${formData.policeApproval.name}`);
+  try {
+    await uploadBytes(policeFormRef, formData.policeApproval);
+    policeFormURL = await getDownloadURL(policeFormRef);
+    console.log('Police form uploaded:', policeFormURL); // Debugging line
+  } catch (error: unknown) {
+    console.error('Error uploading police approval: ', error);
+    if (error instanceof Error) {
+      setError(`Failed to upload police approval. Error: ${error.message}`);
+    } else {
+      setError('Failed to upload police approval due to an unknown error.');
+    }
+    return;
+  }
+}
 
 		const volunteerCollectionRef = collection(db, 'Volunteers');
 		const volunteerDocQuery = query(volunteerCollectionRef);
@@ -221,11 +232,15 @@ const Registration = () => {
 				});
 				console.log('Volunteer details updated successfully!'); // Debugging line
 				alert('!פרטי המתנדב עודכנו בהצלחה');
-			} catch (error) {
+			} catch (error: unknown) {
 				console.error('Error updating document: ', error);
-				setError(`Failed to update volunteer details. Error: ${error.message}`);
+				if (error instanceof Error) {
+				  setError(`Failed to update volunteer details. Error: ${error.message}`);
+				} else {
+				  setError('Failed to update volunteer details due to an unknown error.');
+				}
 				return;
-			}
+			  }
 		} else {
 			// Add a new volunteer document with an auto-generated ID
 			try {
@@ -243,11 +258,15 @@ const Registration = () => {
 				});
 				
 				alert('!טופס נשלח בהצלחה');
-			} catch (error) {
+			} catch (error: unknown) {
 				console.error('Error adding document: ', error);
-				setError(`Failed to add volunteer. Error: ${error.message}`);
+				if (error instanceof Error) {
+				  setError(`Failed to add volunteer. Error: ${error.message}`);
+				} else {
+				  setError('Failed to add volunteer due to an unknown error.');
+				}
 				return;
-			}
+			  }
 		}
 
 		// Handle police approval upload to Police Forms collection
@@ -266,11 +285,15 @@ const Registration = () => {
 					});
 				}
 				
-			} catch (error) {
+			} catch (error: unknown) {
 				console.error('Error updating police forms: ', error);
-				setError(`Failed to update police forms. Error: ${error.message}`);
+				if (error instanceof Error) {
+				  setError(`Failed to update police forms. Error: ${error.message}`);
+				} else {
+				  setError('Failed to update police forms due to an unknown error.');
+				}
 				return;
-			}
+			  }
 		}
 
 		// Clear the form fields

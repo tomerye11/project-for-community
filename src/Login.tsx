@@ -5,18 +5,19 @@ import './Login.css';
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // בצע כאן את האימות של שם המשתמש והסיסמה
-        const isAuthenticated = username === 'admin' && password === 'password'; // יש להחליף בבדיקה מול השרת
+        const isAuthenticated = username === 'admin' && password === 'minhal468!';
 
         if (isAuthenticated) {
-            navigate('/AdminPage2'); 
+            localStorage.setItem('isAuthenticated', 'true');
+            navigate('/AdminPage2');
         } else {
-            alert('שם המשתמש או הסיסמה שגויים');
+            setError('שם המשתמש או הסיסמה שגויים');
         }
     };
 
@@ -41,6 +42,7 @@ const Login: React.FC = () => {
                     />
                     <button type="submit">התחבר</button>
                 </form>
+                {error && <p className="error-message">{error}</p>}
             </div>
         </div>
     );

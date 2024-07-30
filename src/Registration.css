@@ -57,7 +57,7 @@
 
 .create h2::before {
     content: ''; /* Add empty content for the logo */
-    background-image: url('logo2.jpg'); /* Set the background image */
+    background-image: url('registration/build/logo2.jpg'); /* Set the background image */
     background-size: contain; /* Contain the image within the element */
     background-repeat: no-repeat; /* Prevent image repetition */
     position: absolute; /* Position absolutely within the heading */

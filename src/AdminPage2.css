@@ -33,7 +33,7 @@ html, body {
 
 .header-title {
     font-size: 25px; /* Change title size */
-    margin-left: 66%; /* Move the title to the right */
+    margin-left: 50%; /* Move the title to the right */
     font-size: larger; 
 }
 
